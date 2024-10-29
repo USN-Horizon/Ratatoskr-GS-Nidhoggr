@@ -1,6 +1,7 @@
 # Horizon Groundstation
-
 The Horizon Groundstation is an application for visualizing real-time sensor data from a rocket, including telemetry and gyro data, through a sophisticated graphical interface. Developed using C++ for data processing and QML for the front-end, this project was created to provide a reliable, real-time monitoring tool as part of the University of South-Eastern Norway’s student company, USN Horizon.
+
+This was the first year of the project, aiming to participate in the **EuroRoc** competition in Portugal with the student rocket launch team. The purpose of this repository is to enable next year’s members of **USN Horizon** to continue developing the project, taking it to new heights.
 
 ## Table of Contents
 ### Groundstation
