@@ -134,6 +134,7 @@ Once all dependencies are installed, you can build the project using `qmake` and
 [QMake Manual (Qt 6)](https://doc.qt.io/qt-6/qmake-manual.html)
 
 ## Authors
+- Emory Høiensahl
 - Hamsa Hashi
 
 
