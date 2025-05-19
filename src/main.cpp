@@ -2,6 +2,7 @@
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
 #include "fermiditycollection.h"
+#include "timer.h"
 
 int main(int argc, char *argv[])
 {
@@ -15,6 +16,7 @@ int main(int argc, char *argv[])
 
     FermidityCollection* fmCollection = new FermidityCollection();
 
+    qmlRegisterType<CountupTimer>("com.horizon.components", 1, 0, "CountupTimer");
 
     qmlRegisterType<FermidityCollection>("FermidityCollection", 1, 0, "FermidityCollection");
 

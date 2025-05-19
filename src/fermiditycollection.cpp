@@ -10,7 +10,7 @@ FermidityCollection::FermidityCollection(QObject *parent)
 {
     registerControllers();
 
-    const auto humidityList = humidity_utils::parseCsv();
+    const auto humidityList = humidity_utils::parseCsv("text.csv");
     m_testController->setHumidityList( humidityList );
     m_humidityModel->setHumidityList( humidityList );
 }

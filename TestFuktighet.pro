@@ -1,5 +1,6 @@
-QT += quick charts qml core gui
+QT += quick widgets graphs qml core gui
 CONFIG += c++17
+CONFIG += console
 
 # CONFIG += qmltypes
 # QML_IMPORT_NAME = FmControllers
@@ -11,12 +12,14 @@ SOURCES += \
         src/main.cpp \
         src/fermiditycollection.cpp \
         src/testcontroller.cpp \
+        src/timer.cpp \
         src/utils/humidityutils.cpp \
         src/models/humiditymodel.cpp
 
 HEADERS +=  \
     src/fermiditycollection.h \
     src/testcontroller.h \
+    src/timer.h \
     src/utils/humidityutils.h \
     src/models/humiditymodel.h
 

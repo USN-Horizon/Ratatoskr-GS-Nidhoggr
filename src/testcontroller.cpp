@@ -25,8 +25,8 @@ humidity_utils::HumidityList TestController::humidityList() const
 
 void TestController::setHumidityList(const humidity_utils::HumidityList &newHumidityList)
 {
-    if (m_humidityList == newHumidityList)
-        return;
+    //if (m_humidityList == newHumidityList)
+    //    return;
     m_humidityList = newHumidityList;
     emit humidityListChanged();
 }

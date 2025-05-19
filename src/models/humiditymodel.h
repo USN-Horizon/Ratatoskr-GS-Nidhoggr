@@ -1,29 +1,29 @@
+// humiditymodel.h
 #pragma once
-#include <QAbstractListModel>
+#include <QStandardItemModel>
 #include "utils/humidityutils.h"
 
-class HumidityModel : public QAbstractListModel {
+class HumidityModel : public QStandardItemModel {
     Q_OBJECT
-
 public:
     enum Roles {
-        X_role = Qt::UserRole + 1,
-        Y_role,
+        XRole = Qt::UserRole + 1,
+        YRole
     };
 
     explicit HumidityModel(QObject *parent = nullptr);
-    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
-    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+    explicit HumidityModel(int rows, int columns, QObject *parent = nullptr);
+
     QHash<int, QByteArray> roleNames() const override;
 
     void setHumidityList(const humidity_utils::HumidityList &newHumidityList);
-    void appendData( qreal a_value );
+    void appendData(qreal x, qreal y);
 
-private:
-    struct DataPoint {
-        qreal x;
-        qreal y;
-    };
+    Q_INVOKABLE void removeData(int row);
+    Q_INVOKABLE QVariantMap get(int row) const;
 
-    QList<DataPoint> dataPoints;
+    // Optional: If you want to explicitly maintain column count
+    static const int X_COLUMN = 0;
+    static const int Y_COLUMN = 1;
+    static const int COLUMN_COUNT = 2;
 };
