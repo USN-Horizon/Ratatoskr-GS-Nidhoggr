@@ -11,17 +11,29 @@ INCLUDEPATH = src
 SOURCES += \
         src/main.cpp \
         src/fermiditycollection.cpp \
+        src/models/flightstatemodel.cpp \
+        src/utils/flightstateutils.cpp \
+        src/models/timeseriesmodel.cpp \
+        src/models/timewindowproxymodel.cpp \
         src/testcontroller.cpp \
         src/timer.cpp \
+        src/utils/flightlogfactory.cpp \
         src/utils/humidityutils.cpp \
-        src/models/humiditymodel.cpp
+        src/models/humiditymodel.cpp \
+        src/utils/timeseriesfactory.cpp
 
 HEADERS +=  \
     src/fermiditycollection.h \
+    src/models/flightstatemodel.h \
+    src/utils/flightstateutils.h \
+    src/models/timeseriesmodel.h \
+    src/models/timewindowproxymodel.h \
     src/testcontroller.h \
     src/timer.h \
+    src/utils/flightlogfactory.h \
     src/utils/humidityutils.h \
-    src/models/humiditymodel.h
+    src/models/humiditymodel.h \
+    src/utils/timeseriesfactory.h
 
 		
 RESOURCES += qml/qml.qrc

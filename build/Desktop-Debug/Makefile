@@ -17,7 +17,7 @@ CXX           = g++
 DEFINES       = -DQT_QML_DEBUG -DQT_GRAPHS_LIB -DQT_QUICK3D_LIB -DQT_QUICK3DRUNTIMERENDER_LIB -DQT_QUICK_LIB -DQT_OPENGL_LIB -DQT_WIDGETS_LIB -DQT_QUICK3DUTILS_LIB -DQT_SHADERTOOLS_LIB -DQT_GUI_LIB -DQT_QMLMETA_LIB -DQT_QMLMODELS_LIB -DQT_QMLWORKERSCRIPT_LIB -DQT_QML_LIB -DQT_QMLINTEGRATION_LIB -DQT_NETWORK_LIB -DQT_CONCURRENT_LIB -DQT_CORE_LIB
 CFLAGS        = -pipe -g -Wall -Wextra -mno-direct-extern-access -D_REENTRANT $(DEFINES)
 CXXFLAGS      = -pipe -g -std=gnu++1z -Wall -Wextra -mno-direct-extern-access -D_REENTRANT $(DEFINES)
-INCPATH       = -I../../../HorizonGroundStation -I. -I../../src -I/usr/include/qt6 -I/usr/include/qt6/QtGraphs -I/usr/include/qt6/QtQuick3D -I/usr/include/qt6/QtQuick3DRuntimeRender -I/usr/include/qt6/QtQuick -I/usr/include/qt6/QtOpenGL -I/usr/include/qt6/QtWidgets -I/usr/include/qt6/QtQuick3DUtils -I/usr/include/qt6/QtShaderTools -I/usr/include/qt6/QtGui -I/usr/include/qt6/QtQmlMeta -I/usr/include/qt6/QtQmlModels -I/usr/include/qt6/QtQmlWorkerScript -I/usr/include/qt6/QtQml -I/usr/include/qt6/QtQmlIntegration -I/usr/include/qt6/QtNetwork -I/usr/include/qt6/QtConcurrent -I/usr/include/qt6/QtCore -I. -I/usr/lib/qt6/mkspecs/linux-g++
+INCPATH       = -I../../../Ratatoskr-GS-Nidhoggr -I. -I../../src -I/usr/include/qt6 -I/usr/include/qt6/QtGraphs -I/usr/include/qt6/QtQuick3D -I/usr/include/qt6/QtQuick3DRuntimeRender -I/usr/include/qt6/QtQuick -I/usr/include/qt6/QtOpenGL -I/usr/include/qt6/QtWidgets -I/usr/include/qt6/QtQuick3DUtils -I/usr/include/qt6/QtShaderTools -I/usr/include/qt6/QtGui -I/usr/include/qt6/QtQmlMeta -I/usr/include/qt6/QtQmlModels -I/usr/include/qt6/QtQmlWorkerScript -I/usr/include/qt6/QtQml -I/usr/include/qt6/QtQmlIntegration -I/usr/include/qt6/QtNetwork -I/usr/include/qt6/QtConcurrent -I/usr/include/qt6/QtCore -I. -I/usr/lib/qt6/mkspecs/linux-g++
 QMAKE         = /usr/bin/qmake6
 DEL_FILE      = rm -f
 CHK_DIR_EXISTS= test -d
@@ -37,7 +37,7 @@ MOVE          = mv -f
 TAR           = tar -cf
 COMPRESS      = gzip -9f
 DISTNAME      = TestFuktighet1.0.0
-DISTDIR = /home/syvers/Programmering/HorizonGroundStation/build/Desktop-Debug/.tmp/TestFuktighet1.0.0
+DISTDIR = /home/syvers/Programmering/Horizon/Ratatoskr-GS-Nidhoggr/build/Desktop-Debug/.tmp/TestFuktighet1.0.0
 LINK          = g++
 LFLAGS        = -Wl,-rpath,/usr/lib -Wl,-rpath-link,/usr/lib
 LIBS          = $(SUBLIBS) /usr/lib/libQt6Graphs.so /usr/lib/libQt6Quick3D.so /usr/lib/libQt6Quick3DRuntimeRender.so /usr/lib/libQt6Quick.so /usr/lib/libQt6OpenGL.so /usr/lib/libQt6Widgets.so /usr/lib/libQt6Quick3DUtils.so /usr/lib/libQt6ShaderTools.so /usr/lib/libQt6Gui.so /usr/lib/libGLX.so /usr/lib/libOpenGL.so /usr/lib/libQt6QmlMeta.so /usr/lib/libQt6QmlModels.so /usr/lib/libQt6QmlWorkerScript.so /usr/lib/libQt6Qml.so /usr/lib/libQt6Network.so /usr/lib/libQt6Concurrent.so /usr/lib/libQt6Core.so -lpthread -lGLX -lOpenGL   
@@ -54,22 +54,40 @@ OBJECTS_DIR   = ./
 
 SOURCES       = ../../src/main.cpp \
 		../../src/fermiditycollection.cpp \
+		../../src/models/flightstatemodel.cpp \
+		../../src/utils/flightstateutils.cpp \
+		../../src/models/timeseriesmodel.cpp \
+		../../src/models/timewindowproxymodel.cpp \
 		../../src/testcontroller.cpp \
 		../../src/timer.cpp \
+		../../src/utils/flightlogfactory.cpp \
 		../../src/utils/humidityutils.cpp \
-		../../src/models/humiditymodel.cpp qrc_qml.cpp \
+		../../src/models/humiditymodel.cpp \
+		../../src/utils/timeseriesfactory.cpp qrc_qml.cpp \
 		moc_fermiditycollection.cpp \
+		moc_flightstatemodel.cpp \
+		moc_timeseriesmodel.cpp \
+		moc_timewindowproxymodel.cpp \
 		moc_testcontroller.cpp \
 		moc_timer.cpp \
 		moc_humiditymodel.cpp
 OBJECTS       = main.o \
 		fermiditycollection.o \
+		flightstatemodel.o \
+		flightstateutils.o \
+		timeseriesmodel.o \
+		timewindowproxymodel.o \
 		testcontroller.o \
 		timer.o \
+		flightlogfactory.o \
 		humidityutils.o \
 		humiditymodel.o \
+		timeseriesfactory.o \
 		qrc_qml.o \
 		moc_fermiditycollection.o \
+		moc_flightstatemodel.o \
+		moc_timeseriesmodel.o \
+		moc_timewindowproxymodel.o \
 		moc_testcontroller.o \
 		moc_timer.o \
 		moc_humiditymodel.o
@@ -82,10 +100,6 @@ DIST          = /usr/lib/qt6/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt6/mkspecs/common/g++-base.conf \
 		/usr/lib/qt6/mkspecs/common/g++-unix.conf \
 		/usr/lib/qt6/mkspecs/qconfig.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_KDSoapClient.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_KDSoapServer.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_KF6UserFeedbackCore.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_KF6UserFeedbackWidgets.pri \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_charts.pri \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_charts_private.pri \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_chartsqml.pri \
@@ -117,8 +131,6 @@ DIST          = /usr/lib/qt6/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_gui_private.pri \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_help.pri \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_help_private.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_lib_hunspellinputmethod.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_lib_hunspellinputmethod_private.pri \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_input_support_private.pri \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_kms_support_private.pri \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_labsanimation.pri \
@@ -275,15 +287,6 @@ DIST          = /usr/lib/qt6/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_quickvectorimagegenerator_private.pri \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_quickwidgets.pri \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_quickwidgets_private.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_lib_scxml.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_lib_scxml_private.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_lib_scxmlglobal_private.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_lib_scxmlqml.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_lib_scxmlqml_private.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_lib_sensors.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_lib_sensors_private.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_lib_sensorsquick.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_lib_sensorsquick_private.pri \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_serialport.pri \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_serialport_private.pri \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_shadertools.pri \
@@ -292,10 +295,6 @@ DIST          = /usr/lib/qt6/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_spatialaudio_private.pri \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_sql.pri \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_sql_private.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_lib_statemachine.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_lib_statemachine_private.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_lib_statemachineqml.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_lib_statemachineqml_private.pri \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_svg.pri \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_svg_private.pri \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_svgwidgets.pri \
@@ -309,12 +308,6 @@ DIST          = /usr/lib/qt6/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_uiplugin.pri \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_uitools.pri \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_uitools_private.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_lib_virtualkeyboard.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_lib_virtualkeyboard_private.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_lib_virtualkeyboardqml.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_lib_virtualkeyboardqml_private.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_lib_virtualkeyboardsettings.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_lib_virtualkeyboardsettings_private.pri \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_wayland_egl_client_hw_integration_private.pri \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_wayland_egl_compositor_hw_integration_private.pri \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_waylandclient.pri \
@@ -342,23 +335,12 @@ DIST          = /usr/lib/qt6/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_webenginequickdelegatesqml_private.pri \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_webenginewidgets.pri \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_webenginewidgets_private.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_lib_websockets.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_lib_websockets_private.pri \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_widgets.pri \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_widgets_private.pri \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_wl_shell_integration_private.pri \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_xcb_qpa_lib_private.pri \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_xml.pri \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_xml_private.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_QCoroCore.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_QCoroCoro.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_QCoroDBus.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_QCoroNetwork.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_QCoroQml.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_QCoroQuick.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_QCoroTest.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_QCoroWebSockets.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_Qt6Keychain.pri \
 		/usr/lib/qt6/mkspecs/features/qt_functions.prf \
 		/usr/lib/qt6/mkspecs/features/qt_config.prf \
 		/usr/lib/qt6/mkspecs/linux-g++/qmake.conf \
@@ -388,15 +370,27 @@ DIST          = /usr/lib/qt6/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt6/mkspecs/features/yacc.prf \
 		/usr/lib/qt6/mkspecs/features/lex.prf \
 		../../../../TestFuktighet.pro ../../src/fermiditycollection.h \
+		../../src/models/flightstatemodel.h \
+		../../src/utils/flightstateutils.h \
+		../../src/models/timeseriesmodel.h \
+		../../src/models/timewindowproxymodel.h \
 		../../src/testcontroller.h \
 		../../src/timer.h \
+		../../src/utils/flightlogfactory.h \
 		../../src/utils/humidityutils.h \
-		../../src/models/humiditymodel.h ../../src/main.cpp \
+		../../src/models/humiditymodel.h \
+		../../src/utils/timeseriesfactory.h ../../src/main.cpp \
 		../../src/fermiditycollection.cpp \
+		../../src/models/flightstatemodel.cpp \
+		../../src/utils/flightstateutils.cpp \
+		../../src/models/timeseriesmodel.cpp \
+		../../src/models/timewindowproxymodel.cpp \
 		../../src/testcontroller.cpp \
 		../../src/timer.cpp \
+		../../src/utils/flightlogfactory.cpp \
 		../../src/utils/humidityutils.cpp \
-		../../src/models/humiditymodel.cpp
+		../../src/models/humiditymodel.cpp \
+		../../src/utils/timeseriesfactory.cpp
 QMAKE_TARGET  = TestFuktighet
 DESTDIR       = 
 TARGET        = TestFuktighet
@@ -417,10 +411,6 @@ Makefile: ../../TestFuktighet.pro /usr/lib/qt6/mkspecs/linux-g++/qmake.conf /usr
 		/usr/lib/qt6/mkspecs/common/g++-base.conf \
 		/usr/lib/qt6/mkspecs/common/g++-unix.conf \
 		/usr/lib/qt6/mkspecs/qconfig.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_KDSoapClient.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_KDSoapServer.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_KF6UserFeedbackCore.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_KF6UserFeedbackWidgets.pri \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_charts.pri \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_charts_private.pri \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_chartsqml.pri \
@@ -452,8 +442,6 @@ Makefile: ../../TestFuktighet.pro /usr/lib/qt6/mkspecs/linux-g++/qmake.conf /usr
 		/usr/lib/qt6/mkspecs/modules/qt_lib_gui_private.pri \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_help.pri \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_help_private.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_lib_hunspellinputmethod.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_lib_hunspellinputmethod_private.pri \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_input_support_private.pri \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_kms_support_private.pri \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_labsanimation.pri \
@@ -610,15 +598,6 @@ Makefile: ../../TestFuktighet.pro /usr/lib/qt6/mkspecs/linux-g++/qmake.conf /usr
 		/usr/lib/qt6/mkspecs/modules/qt_lib_quickvectorimagegenerator_private.pri \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_quickwidgets.pri \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_quickwidgets_private.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_lib_scxml.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_lib_scxml_private.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_lib_scxmlglobal_private.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_lib_scxmlqml.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_lib_scxmlqml_private.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_lib_sensors.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_lib_sensors_private.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_lib_sensorsquick.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_lib_sensorsquick_private.pri \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_serialport.pri \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_serialport_private.pri \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_shadertools.pri \
@@ -627,10 +606,6 @@ Makefile: ../../TestFuktighet.pro /usr/lib/qt6/mkspecs/linux-g++/qmake.conf /usr
 		/usr/lib/qt6/mkspecs/modules/qt_lib_spatialaudio_private.pri \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_sql.pri \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_sql_private.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_lib_statemachine.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_lib_statemachine_private.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_lib_statemachineqml.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_lib_statemachineqml_private.pri \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_svg.pri \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_svg_private.pri \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_svgwidgets.pri \
@@ -644,12 +619,6 @@ Makefile: ../../TestFuktighet.pro /usr/lib/qt6/mkspecs/linux-g++/qmake.conf /usr
 		/usr/lib/qt6/mkspecs/modules/qt_lib_uiplugin.pri \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_uitools.pri \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_uitools_private.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_lib_virtualkeyboard.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_lib_virtualkeyboard_private.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_lib_virtualkeyboardqml.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_lib_virtualkeyboardqml_private.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_lib_virtualkeyboardsettings.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_lib_virtualkeyboardsettings_private.pri \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_wayland_egl_client_hw_integration_private.pri \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_wayland_egl_compositor_hw_integration_private.pri \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_waylandclient.pri \
@@ -677,23 +646,12 @@ Makefile: ../../TestFuktighet.pro /usr/lib/qt6/mkspecs/linux-g++/qmake.conf /usr
 		/usr/lib/qt6/mkspecs/modules/qt_lib_webenginequickdelegatesqml_private.pri \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_webenginewidgets.pri \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_webenginewidgets_private.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_lib_websockets.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_lib_websockets_private.pri \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_widgets.pri \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_widgets_private.pri \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_wl_shell_integration_private.pri \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_xcb_qpa_lib_private.pri \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_xml.pri \
 		/usr/lib/qt6/mkspecs/modules/qt_lib_xml_private.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_QCoroCore.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_QCoroCoro.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_QCoroDBus.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_QCoroNetwork.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_QCoroQml.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_QCoroQuick.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_QCoroTest.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_QCoroWebSockets.pri \
-		/usr/lib/qt6/mkspecs/modules/qt_Qt6Keychain.pri \
 		/usr/lib/qt6/mkspecs/features/qt_functions.prf \
 		/usr/lib/qt6/mkspecs/features/qt_config.prf \
 		/usr/lib/qt6/mkspecs/linux-g++/qmake.conf \
@@ -750,10 +708,6 @@ Makefile: ../../TestFuktighet.pro /usr/lib/qt6/mkspecs/linux-g++/qmake.conf /usr
 /usr/lib/qt6/mkspecs/common/g++-base.conf:
 /usr/lib/qt6/mkspecs/common/g++-unix.conf:
 /usr/lib/qt6/mkspecs/qconfig.pri:
-/usr/lib/qt6/mkspecs/modules/qt_KDSoapClient.pri:
-/usr/lib/qt6/mkspecs/modules/qt_KDSoapServer.pri:
-/usr/lib/qt6/mkspecs/modules/qt_KF6UserFeedbackCore.pri:
-/usr/lib/qt6/mkspecs/modules/qt_KF6UserFeedbackWidgets.pri:
 /usr/lib/qt6/mkspecs/modules/qt_lib_charts.pri:
 /usr/lib/qt6/mkspecs/modules/qt_lib_charts_private.pri:
 /usr/lib/qt6/mkspecs/modules/qt_lib_chartsqml.pri:
@@ -785,8 +739,6 @@ Makefile: ../../TestFuktighet.pro /usr/lib/qt6/mkspecs/linux-g++/qmake.conf /usr
 /usr/lib/qt6/mkspecs/modules/qt_lib_gui_private.pri:
 /usr/lib/qt6/mkspecs/modules/qt_lib_help.pri:
 /usr/lib/qt6/mkspecs/modules/qt_lib_help_private.pri:
-/usr/lib/qt6/mkspecs/modules/qt_lib_hunspellinputmethod.pri:
-/usr/lib/qt6/mkspecs/modules/qt_lib_hunspellinputmethod_private.pri:
 /usr/lib/qt6/mkspecs/modules/qt_lib_input_support_private.pri:
 /usr/lib/qt6/mkspecs/modules/qt_lib_kms_support_private.pri:
 /usr/lib/qt6/mkspecs/modules/qt_lib_labsanimation.pri:
@@ -943,15 +895,6 @@ Makefile: ../../TestFuktighet.pro /usr/lib/qt6/mkspecs/linux-g++/qmake.conf /usr
 /usr/lib/qt6/mkspecs/modules/qt_lib_quickvectorimagegenerator_private.pri:
 /usr/lib/qt6/mkspecs/modules/qt_lib_quickwidgets.pri:
 /usr/lib/qt6/mkspecs/modules/qt_lib_quickwidgets_private.pri:
-/usr/lib/qt6/mkspecs/modules/qt_lib_scxml.pri:
-/usr/lib/qt6/mkspecs/modules/qt_lib_scxml_private.pri:
-/usr/lib/qt6/mkspecs/modules/qt_lib_scxmlglobal_private.pri:
-/usr/lib/qt6/mkspecs/modules/qt_lib_scxmlqml.pri:
-/usr/lib/qt6/mkspecs/modules/qt_lib_scxmlqml_private.pri:
-/usr/lib/qt6/mkspecs/modules/qt_lib_sensors.pri:
-/usr/lib/qt6/mkspecs/modules/qt_lib_sensors_private.pri:
-/usr/lib/qt6/mkspecs/modules/qt_lib_sensorsquick.pri:
-/usr/lib/qt6/mkspecs/modules/qt_lib_sensorsquick_private.pri:
 /usr/lib/qt6/mkspecs/modules/qt_lib_serialport.pri:
 /usr/lib/qt6/mkspecs/modules/qt_lib_serialport_private.pri:
 /usr/lib/qt6/mkspecs/modules/qt_lib_shadertools.pri:
@@ -960,10 +903,6 @@ Makefile: ../../TestFuktighet.pro /usr/lib/qt6/mkspecs/linux-g++/qmake.conf /usr
 /usr/lib/qt6/mkspecs/modules/qt_lib_spatialaudio_private.pri:
 /usr/lib/qt6/mkspecs/modules/qt_lib_sql.pri:
 /usr/lib/qt6/mkspecs/modules/qt_lib_sql_private.pri:
-/usr/lib/qt6/mkspecs/modules/qt_lib_statemachine.pri:
-/usr/lib/qt6/mkspecs/modules/qt_lib_statemachine_private.pri:
-/usr/lib/qt6/mkspecs/modules/qt_lib_statemachineqml.pri:
-/usr/lib/qt6/mkspecs/modules/qt_lib_statemachineqml_private.pri:
 /usr/lib/qt6/mkspecs/modules/qt_lib_svg.pri:
 /usr/lib/qt6/mkspecs/modules/qt_lib_svg_private.pri:
 /usr/lib/qt6/mkspecs/modules/qt_lib_svgwidgets.pri:
@@ -977,12 +916,6 @@ Makefile: ../../TestFuktighet.pro /usr/lib/qt6/mkspecs/linux-g++/qmake.conf /usr
 /usr/lib/qt6/mkspecs/modules/qt_lib_uiplugin.pri:
 /usr/lib/qt6/mkspecs/modules/qt_lib_uitools.pri:
 /usr/lib/qt6/mkspecs/modules/qt_lib_uitools_private.pri:
-/usr/lib/qt6/mkspecs/modules/qt_lib_virtualkeyboard.pri:
-/usr/lib/qt6/mkspecs/modules/qt_lib_virtualkeyboard_private.pri:
-/usr/lib/qt6/mkspecs/modules/qt_lib_virtualkeyboardqml.pri:
-/usr/lib/qt6/mkspecs/modules/qt_lib_virtualkeyboardqml_private.pri:
-/usr/lib/qt6/mkspecs/modules/qt_lib_virtualkeyboardsettings.pri:
-/usr/lib/qt6/mkspecs/modules/qt_lib_virtualkeyboardsettings_private.pri:
 /usr/lib/qt6/mkspecs/modules/qt_lib_wayland_egl_client_hw_integration_private.pri:
 /usr/lib/qt6/mkspecs/modules/qt_lib_wayland_egl_compositor_hw_integration_private.pri:
 /usr/lib/qt6/mkspecs/modules/qt_lib_waylandclient.pri:
@@ -1010,23 +943,12 @@ Makefile: ../../TestFuktighet.pro /usr/lib/qt6/mkspecs/linux-g++/qmake.conf /usr
 /usr/lib/qt6/mkspecs/modules/qt_lib_webenginequickdelegatesqml_private.pri:
 /usr/lib/qt6/mkspecs/modules/qt_lib_webenginewidgets.pri:
 /usr/lib/qt6/mkspecs/modules/qt_lib_webenginewidgets_private.pri:
-/usr/lib/qt6/mkspecs/modules/qt_lib_websockets.pri:
-/usr/lib/qt6/mkspecs/modules/qt_lib_websockets_private.pri:
 /usr/lib/qt6/mkspecs/modules/qt_lib_widgets.pri:
 /usr/lib/qt6/mkspecs/modules/qt_lib_widgets_private.pri:
 /usr/lib/qt6/mkspecs/modules/qt_lib_wl_shell_integration_private.pri:
 /usr/lib/qt6/mkspecs/modules/qt_lib_xcb_qpa_lib_private.pri:
 /usr/lib/qt6/mkspecs/modules/qt_lib_xml.pri:
 /usr/lib/qt6/mkspecs/modules/qt_lib_xml_private.pri:
-/usr/lib/qt6/mkspecs/modules/qt_QCoroCore.pri:
-/usr/lib/qt6/mkspecs/modules/qt_QCoroCoro.pri:
-/usr/lib/qt6/mkspecs/modules/qt_QCoroDBus.pri:
-/usr/lib/qt6/mkspecs/modules/qt_QCoroNetwork.pri:
-/usr/lib/qt6/mkspecs/modules/qt_QCoroQml.pri:
-/usr/lib/qt6/mkspecs/modules/qt_QCoroQuick.pri:
-/usr/lib/qt6/mkspecs/modules/qt_QCoroTest.pri:
-/usr/lib/qt6/mkspecs/modules/qt_QCoroWebSockets.pri:
-/usr/lib/qt6/mkspecs/modules/qt_Qt6Keychain.pri:
 /usr/lib/qt6/mkspecs/features/qt_functions.prf:
 /usr/lib/qt6/mkspecs/features/qt_config.prf:
 /usr/lib/qt6/mkspecs/linux-g++/qmake.conf:
@@ -1089,8 +1011,8 @@ distdir: FORCE
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents ../../qml/qml.qrc $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/qt6/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents ../../src/fermiditycollection.h ../../src/testcontroller.h ../../src/timer.h ../../src/utils/humidityutils.h ../../src/models/humiditymodel.h $(DISTDIR)/
-	$(COPY_FILE) --parents ../../src/main.cpp ../../src/fermiditycollection.cpp ../../src/testcontroller.cpp ../../src/timer.cpp ../../src/utils/humidityutils.cpp ../../src/models/humiditymodel.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents ../../src/fermiditycollection.h ../../src/models/flightstatemodel.h ../../src/utils/flightstateutils.h ../../src/models/timeseriesmodel.h ../../src/models/timewindowproxymodel.h ../../src/testcontroller.h ../../src/timer.h ../../src/utils/flightlogfactory.h ../../src/utils/humidityutils.h ../../src/models/humiditymodel.h ../../src/utils/timeseriesfactory.h $(DISTDIR)/
+	$(COPY_FILE) --parents ../../src/main.cpp ../../src/fermiditycollection.cpp ../../src/models/flightstatemodel.cpp ../../src/utils/flightstateutils.cpp ../../src/models/timeseriesmodel.cpp ../../src/models/timewindowproxymodel.cpp ../../src/testcontroller.cpp ../../src/timer.cpp ../../src/utils/flightlogfactory.cpp ../../src/utils/humidityutils.cpp ../../src/models/humiditymodel.cpp ../../src/utils/timeseriesfactory.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -1119,8 +1041,12 @@ compiler_rcc_clean:
 	-$(DEL_FILE) qrc_qml.cpp
 qrc_qml.cpp: ../../qml/qml.qrc \
 		/usr/lib/qt6/rcc \
+		../../qml/RealtimeGraph.qml \
 		../../qml/qtquickcontrols2.conf \
 		../../qml/RocketVisualization.qml \
+		../../qml/AltitudeGraph.qml \
+		../../qml/VelocityGraph.qml \
+		../../qml/FlightStateView.qml \
 		../../qml/main.qml \
 		../../qml/main.qml \
 		../../qml/FermidityGraph.qml \
@@ -1134,33 +1060,51 @@ compiler_moc_predefs_clean:
 moc_predefs.h: /usr/lib/qt6/mkspecs/features/data/dummy.cpp
 	g++ -pipe -g -std=gnu++1z -Wall -Wextra -dM -E -o moc_predefs.h /usr/lib/qt6/mkspecs/features/data/dummy.cpp
 
-compiler_moc_header_make_all: moc_fermiditycollection.cpp moc_testcontroller.cpp moc_timer.cpp moc_humiditymodel.cpp
+compiler_moc_header_make_all: moc_fermiditycollection.cpp moc_flightstatemodel.cpp moc_timeseriesmodel.cpp moc_timewindowproxymodel.cpp moc_testcontroller.cpp moc_timer.cpp moc_humiditymodel.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) moc_fermiditycollection.cpp moc_testcontroller.cpp moc_timer.cpp moc_humiditymodel.cpp
+	-$(DEL_FILE) moc_fermiditycollection.cpp moc_flightstatemodel.cpp moc_timeseriesmodel.cpp moc_timewindowproxymodel.cpp moc_testcontroller.cpp moc_timer.cpp moc_humiditymodel.cpp
 moc_fermiditycollection.cpp: ../../src/fermiditycollection.h \
 		../../src/testcontroller.h \
 		../../src/utils/humidityutils.h \
 		../../src/models/humiditymodel.h \
 		moc_predefs.h \
 		/usr/lib/qt6/moc
-	/usr/lib/qt6/moc $(DEFINES) --include /home/syvers/Programmering/HorizonGroundStation/build/Desktop-Debug/moc_predefs.h -I/usr/lib/qt6/mkspecs/linux-g++ -I/home/syvers/Programmering/HorizonGroundStation -I/home/syvers/Programmering/HorizonGroundStation/src -I/usr/include/qt6 -I/usr/include/qt6/QtGraphs -I/usr/include/qt6/QtQuick3D -I/usr/include/qt6/QtQuick3DRuntimeRender -I/usr/include/qt6/QtQuick -I/usr/include/qt6/QtOpenGL -I/usr/include/qt6/QtWidgets -I/usr/include/qt6/QtQuick3DUtils -I/usr/include/qt6/QtShaderTools -I/usr/include/qt6/QtGui -I/usr/include/qt6/QtQmlMeta -I/usr/include/qt6/QtQmlModels -I/usr/include/qt6/QtQmlWorkerScript -I/usr/include/qt6/QtQml -I/usr/include/qt6/QtQmlIntegration -I/usr/include/qt6/QtNetwork -I/usr/include/qt6/QtConcurrent -I/usr/include/qt6/QtCore -I. -I/usr/include/c++/15.1.1 -I/usr/include/c++/15.1.1/x86_64-pc-linux-gnu -I/usr/include/c++/15.1.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/15.1.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/15.1.1/include-fixed -I/usr/include ../../src/fermiditycollection.h -o moc_fermiditycollection.cpp
+	/usr/lib/qt6/moc $(DEFINES) --include /home/syvers/Programmering/Horizon/Ratatoskr-GS-Nidhoggr/build/Desktop-Debug/moc_predefs.h -I/usr/lib/qt6/mkspecs/linux-g++ -I/home/syvers/Programmering/Horizon/Ratatoskr-GS-Nidhoggr -I/home/syvers/Programmering/Horizon/Ratatoskr-GS-Nidhoggr/src -I/usr/include/qt6 -I/usr/include/qt6/QtGraphs -I/usr/include/qt6/QtQuick3D -I/usr/include/qt6/QtQuick3DRuntimeRender -I/usr/include/qt6/QtQuick -I/usr/include/qt6/QtOpenGL -I/usr/include/qt6/QtWidgets -I/usr/include/qt6/QtQuick3DUtils -I/usr/include/qt6/QtShaderTools -I/usr/include/qt6/QtGui -I/usr/include/qt6/QtQmlMeta -I/usr/include/qt6/QtQmlModels -I/usr/include/qt6/QtQmlWorkerScript -I/usr/include/qt6/QtQml -I/usr/include/qt6/QtQmlIntegration -I/usr/include/qt6/QtNetwork -I/usr/include/qt6/QtConcurrent -I/usr/include/qt6/QtCore -I. -I/usr/include/c++/15.1.1 -I/usr/include/c++/15.1.1/x86_64-pc-linux-gnu -I/usr/include/c++/15.1.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/15.1.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/15.1.1/include-fixed -I/usr/include ../../src/fermiditycollection.h -o moc_fermiditycollection.cpp
+
+moc_flightstatemodel.cpp: ../../src/models/flightstatemodel.h \
+		../../src/models/timeseriesmodel.h \
+		../../src/utils/flightstateutils.h \
+		moc_predefs.h \
+		/usr/lib/qt6/moc
+	/usr/lib/qt6/moc $(DEFINES) --include /home/syvers/Programmering/Horizon/Ratatoskr-GS-Nidhoggr/build/Desktop-Debug/moc_predefs.h -I/usr/lib/qt6/mkspecs/linux-g++ -I/home/syvers/Programmering/Horizon/Ratatoskr-GS-Nidhoggr -I/home/syvers/Programmering/Horizon/Ratatoskr-GS-Nidhoggr/src -I/usr/include/qt6 -I/usr/include/qt6/QtGraphs -I/usr/include/qt6/QtQuick3D -I/usr/include/qt6/QtQuick3DRuntimeRender -I/usr/include/qt6/QtQuick -I/usr/include/qt6/QtOpenGL -I/usr/include/qt6/QtWidgets -I/usr/include/qt6/QtQuick3DUtils -I/usr/include/qt6/QtShaderTools -I/usr/include/qt6/QtGui -I/usr/include/qt6/QtQmlMeta -I/usr/include/qt6/QtQmlModels -I/usr/include/qt6/QtQmlWorkerScript -I/usr/include/qt6/QtQml -I/usr/include/qt6/QtQmlIntegration -I/usr/include/qt6/QtNetwork -I/usr/include/qt6/QtConcurrent -I/usr/include/qt6/QtCore -I. -I/usr/include/c++/15.1.1 -I/usr/include/c++/15.1.1/x86_64-pc-linux-gnu -I/usr/include/c++/15.1.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/15.1.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/15.1.1/include-fixed -I/usr/include ../../src/models/flightstatemodel.h -o moc_flightstatemodel.cpp
+
+moc_timeseriesmodel.cpp: ../../src/models/timeseriesmodel.h \
+		moc_predefs.h \
+		/usr/lib/qt6/moc
+	/usr/lib/qt6/moc $(DEFINES) --include /home/syvers/Programmering/Horizon/Ratatoskr-GS-Nidhoggr/build/Desktop-Debug/moc_predefs.h -I/usr/lib/qt6/mkspecs/linux-g++ -I/home/syvers/Programmering/Horizon/Ratatoskr-GS-Nidhoggr -I/home/syvers/Programmering/Horizon/Ratatoskr-GS-Nidhoggr/src -I/usr/include/qt6 -I/usr/include/qt6/QtGraphs -I/usr/include/qt6/QtQuick3D -I/usr/include/qt6/QtQuick3DRuntimeRender -I/usr/include/qt6/QtQuick -I/usr/include/qt6/QtOpenGL -I/usr/include/qt6/QtWidgets -I/usr/include/qt6/QtQuick3DUtils -I/usr/include/qt6/QtShaderTools -I/usr/include/qt6/QtGui -I/usr/include/qt6/QtQmlMeta -I/usr/include/qt6/QtQmlModels -I/usr/include/qt6/QtQmlWorkerScript -I/usr/include/qt6/QtQml -I/usr/include/qt6/QtQmlIntegration -I/usr/include/qt6/QtNetwork -I/usr/include/qt6/QtConcurrent -I/usr/include/qt6/QtCore -I. -I/usr/include/c++/15.1.1 -I/usr/include/c++/15.1.1/x86_64-pc-linux-gnu -I/usr/include/c++/15.1.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/15.1.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/15.1.1/include-fixed -I/usr/include ../../src/models/timeseriesmodel.h -o moc_timeseriesmodel.cpp
+
+moc_timewindowproxymodel.cpp: ../../src/models/timewindowproxymodel.h \
+		../../src/timer.h \
+		moc_predefs.h \
+		/usr/lib/qt6/moc
+	/usr/lib/qt6/moc $(DEFINES) --include /home/syvers/Programmering/Horizon/Ratatoskr-GS-Nidhoggr/build/Desktop-Debug/moc_predefs.h -I/usr/lib/qt6/mkspecs/linux-g++ -I/home/syvers/Programmering/Horizon/Ratatoskr-GS-Nidhoggr -I/home/syvers/Programmering/Horizon/Ratatoskr-GS-Nidhoggr/src -I/usr/include/qt6 -I/usr/include/qt6/QtGraphs -I/usr/include/qt6/QtQuick3D -I/usr/include/qt6/QtQuick3DRuntimeRender -I/usr/include/qt6/QtQuick -I/usr/include/qt6/QtOpenGL -I/usr/include/qt6/QtWidgets -I/usr/include/qt6/QtQuick3DUtils -I/usr/include/qt6/QtShaderTools -I/usr/include/qt6/QtGui -I/usr/include/qt6/QtQmlMeta -I/usr/include/qt6/QtQmlModels -I/usr/include/qt6/QtQmlWorkerScript -I/usr/include/qt6/QtQml -I/usr/include/qt6/QtQmlIntegration -I/usr/include/qt6/QtNetwork -I/usr/include/qt6/QtConcurrent -I/usr/include/qt6/QtCore -I. -I/usr/include/c++/15.1.1 -I/usr/include/c++/15.1.1/x86_64-pc-linux-gnu -I/usr/include/c++/15.1.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/15.1.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/15.1.1/include-fixed -I/usr/include ../../src/models/timewindowproxymodel.h -o moc_timewindowproxymodel.cpp
 
 moc_testcontroller.cpp: ../../src/testcontroller.h \
 		../../src/utils/humidityutils.h \
 		moc_predefs.h \
 		/usr/lib/qt6/moc
-	/usr/lib/qt6/moc $(DEFINES) --include /home/syvers/Programmering/HorizonGroundStation/build/Desktop-Debug/moc_predefs.h -I/usr/lib/qt6/mkspecs/linux-g++ -I/home/syvers/Programmering/HorizonGroundStation -I/home/syvers/Programmering/HorizonGroundStation/src -I/usr/include/qt6 -I/usr/include/qt6/QtGraphs -I/usr/include/qt6/QtQuick3D -I/usr/include/qt6/QtQuick3DRuntimeRender -I/usr/include/qt6/QtQuick -I/usr/include/qt6/QtOpenGL -I/usr/include/qt6/QtWidgets -I/usr/include/qt6/QtQuick3DUtils -I/usr/include/qt6/QtShaderTools -I/usr/include/qt6/QtGui -I/usr/include/qt6/QtQmlMeta -I/usr/include/qt6/QtQmlModels -I/usr/include/qt6/QtQmlWorkerScript -I/usr/include/qt6/QtQml -I/usr/include/qt6/QtQmlIntegration -I/usr/include/qt6/QtNetwork -I/usr/include/qt6/QtConcurrent -I/usr/include/qt6/QtCore -I. -I/usr/include/c++/15.1.1 -I/usr/include/c++/15.1.1/x86_64-pc-linux-gnu -I/usr/include/c++/15.1.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/15.1.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/15.1.1/include-fixed -I/usr/include ../../src/testcontroller.h -o moc_testcontroller.cpp
+	/usr/lib/qt6/moc $(DEFINES) --include /home/syvers/Programmering/Horizon/Ratatoskr-GS-Nidhoggr/build/Desktop-Debug/moc_predefs.h -I/usr/lib/qt6/mkspecs/linux-g++ -I/home/syvers/Programmering/Horizon/Ratatoskr-GS-Nidhoggr -I/home/syvers/Programmering/Horizon/Ratatoskr-GS-Nidhoggr/src -I/usr/include/qt6 -I/usr/include/qt6/QtGraphs -I/usr/include/qt6/QtQuick3D -I/usr/include/qt6/QtQuick3DRuntimeRender -I/usr/include/qt6/QtQuick -I/usr/include/qt6/QtOpenGL -I/usr/include/qt6/QtWidgets -I/usr/include/qt6/QtQuick3DUtils -I/usr/include/qt6/QtShaderTools -I/usr/include/qt6/QtGui -I/usr/include/qt6/QtQmlMeta -I/usr/include/qt6/QtQmlModels -I/usr/include/qt6/QtQmlWorkerScript -I/usr/include/qt6/QtQml -I/usr/include/qt6/QtQmlIntegration -I/usr/include/qt6/QtNetwork -I/usr/include/qt6/QtConcurrent -I/usr/include/qt6/QtCore -I. -I/usr/include/c++/15.1.1 -I/usr/include/c++/15.1.1/x86_64-pc-linux-gnu -I/usr/include/c++/15.1.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/15.1.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/15.1.1/include-fixed -I/usr/include ../../src/testcontroller.h -o moc_testcontroller.cpp
 
 moc_timer.cpp: ../../src/timer.h \
 		moc_predefs.h \
 		/usr/lib/qt6/moc
-	/usr/lib/qt6/moc $(DEFINES) --include /home/syvers/Programmering/HorizonGroundStation/build/Desktop-Debug/moc_predefs.h -I/usr/lib/qt6/mkspecs/linux-g++ -I/home/syvers/Programmering/HorizonGroundStation -I/home/syvers/Programmering/HorizonGroundStation/src -I/usr/include/qt6 -I/usr/include/qt6/QtGraphs -I/usr/include/qt6/QtQuick3D -I/usr/include/qt6/QtQuick3DRuntimeRender -I/usr/include/qt6/QtQuick -I/usr/include/qt6/QtOpenGL -I/usr/include/qt6/QtWidgets -I/usr/include/qt6/QtQuick3DUtils -I/usr/include/qt6/QtShaderTools -I/usr/include/qt6/QtGui -I/usr/include/qt6/QtQmlMeta -I/usr/include/qt6/QtQmlModels -I/usr/include/qt6/QtQmlWorkerScript -I/usr/include/qt6/QtQml -I/usr/include/qt6/QtQmlIntegration -I/usr/include/qt6/QtNetwork -I/usr/include/qt6/QtConcurrent -I/usr/include/qt6/QtCore -I. -I/usr/include/c++/15.1.1 -I/usr/include/c++/15.1.1/x86_64-pc-linux-gnu -I/usr/include/c++/15.1.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/15.1.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/15.1.1/include-fixed -I/usr/include ../../src/timer.h -o moc_timer.cpp
+	/usr/lib/qt6/moc $(DEFINES) --include /home/syvers/Programmering/Horizon/Ratatoskr-GS-Nidhoggr/build/Desktop-Debug/moc_predefs.h -I/usr/lib/qt6/mkspecs/linux-g++ -I/home/syvers/Programmering/Horizon/Ratatoskr-GS-Nidhoggr -I/home/syvers/Programmering/Horizon/Ratatoskr-GS-Nidhoggr/src -I/usr/include/qt6 -I/usr/include/qt6/QtGraphs -I/usr/include/qt6/QtQuick3D -I/usr/include/qt6/QtQuick3DRuntimeRender -I/usr/include/qt6/QtQuick -I/usr/include/qt6/QtOpenGL -I/usr/include/qt6/QtWidgets -I/usr/include/qt6/QtQuick3DUtils -I/usr/include/qt6/QtShaderTools -I/usr/include/qt6/QtGui -I/usr/include/qt6/QtQmlMeta -I/usr/include/qt6/QtQmlModels -I/usr/include/qt6/QtQmlWorkerScript -I/usr/include/qt6/QtQml -I/usr/include/qt6/QtQmlIntegration -I/usr/include/qt6/QtNetwork -I/usr/include/qt6/QtConcurrent -I/usr/include/qt6/QtCore -I. -I/usr/include/c++/15.1.1 -I/usr/include/c++/15.1.1/x86_64-pc-linux-gnu -I/usr/include/c++/15.1.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/15.1.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/15.1.1/include-fixed -I/usr/include ../../src/timer.h -o moc_timer.cpp
 
 moc_humiditymodel.cpp: ../../src/models/humiditymodel.h \
 		../../src/utils/humidityutils.h \
 		moc_predefs.h \
 		/usr/lib/qt6/moc
-	/usr/lib/qt6/moc $(DEFINES) --include /home/syvers/Programmering/HorizonGroundStation/build/Desktop-Debug/moc_predefs.h -I/usr/lib/qt6/mkspecs/linux-g++ -I/home/syvers/Programmering/HorizonGroundStation -I/home/syvers/Programmering/HorizonGroundStation/src -I/usr/include/qt6 -I/usr/include/qt6/QtGraphs -I/usr/include/qt6/QtQuick3D -I/usr/include/qt6/QtQuick3DRuntimeRender -I/usr/include/qt6/QtQuick -I/usr/include/qt6/QtOpenGL -I/usr/include/qt6/QtWidgets -I/usr/include/qt6/QtQuick3DUtils -I/usr/include/qt6/QtShaderTools -I/usr/include/qt6/QtGui -I/usr/include/qt6/QtQmlMeta -I/usr/include/qt6/QtQmlModels -I/usr/include/qt6/QtQmlWorkerScript -I/usr/include/qt6/QtQml -I/usr/include/qt6/QtQmlIntegration -I/usr/include/qt6/QtNetwork -I/usr/include/qt6/QtConcurrent -I/usr/include/qt6/QtCore -I. -I/usr/include/c++/15.1.1 -I/usr/include/c++/15.1.1/x86_64-pc-linux-gnu -I/usr/include/c++/15.1.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/15.1.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/15.1.1/include-fixed -I/usr/include ../../src/models/humiditymodel.h -o moc_humiditymodel.cpp
+	/usr/lib/qt6/moc $(DEFINES) --include /home/syvers/Programmering/Horizon/Ratatoskr-GS-Nidhoggr/build/Desktop-Debug/moc_predefs.h -I/usr/lib/qt6/mkspecs/linux-g++ -I/home/syvers/Programmering/Horizon/Ratatoskr-GS-Nidhoggr -I/home/syvers/Programmering/Horizon/Ratatoskr-GS-Nidhoggr/src -I/usr/include/qt6 -I/usr/include/qt6/QtGraphs -I/usr/include/qt6/QtQuick3D -I/usr/include/qt6/QtQuick3DRuntimeRender -I/usr/include/qt6/QtQuick -I/usr/include/qt6/QtOpenGL -I/usr/include/qt6/QtWidgets -I/usr/include/qt6/QtQuick3DUtils -I/usr/include/qt6/QtShaderTools -I/usr/include/qt6/QtGui -I/usr/include/qt6/QtQmlMeta -I/usr/include/qt6/QtQmlModels -I/usr/include/qt6/QtQmlWorkerScript -I/usr/include/qt6/QtQml -I/usr/include/qt6/QtQmlIntegration -I/usr/include/qt6/QtNetwork -I/usr/include/qt6/QtConcurrent -I/usr/include/qt6/QtCore -I. -I/usr/include/c++/15.1.1 -I/usr/include/c++/15.1.1/x86_64-pc-linux-gnu -I/usr/include/c++/15.1.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/15.1.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/15.1.1/include-fixed -I/usr/include ../../src/models/humiditymodel.h -o moc_humiditymodel.cpp
 
 compiler_moc_objc_header_make_all:
 compiler_moc_objc_header_clean:
@@ -1178,11 +1122,16 @@ compiler_clean: compiler_rcc_clean compiler_moc_predefs_clean compiler_moc_heade
 
 ####### Compile
 
-main.o: ../../src/main.cpp ../../src/fermiditycollection.h \
+main.o: ../../src/main.cpp ../../src/models/timewindowproxymodel.h \
+		../../src/timer.h \
+		../../src/models/flightstatemodel.h \
+		../../src/models/timeseriesmodel.h \
+		../../src/utils/flightstateutils.h \
+		../../src/utils/flightlogfactory.h \
+		../../src/fermiditycollection.h \
 		../../src/testcontroller.h \
 		../../src/utils/humidityutils.h \
-		../../src/models/humiditymodel.h \
-		../../src/timer.h
+		../../src/models/humiditymodel.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o ../../src/main.cpp
 
 fermiditycollection.o: ../../src/fermiditycollection.cpp ../../src/fermiditycollection.h \
@@ -1191,12 +1140,34 @@ fermiditycollection.o: ../../src/fermiditycollection.cpp ../../src/fermiditycoll
 		../../src/models/humiditymodel.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o fermiditycollection.o ../../src/fermiditycollection.cpp
 
+flightstatemodel.o: ../../src/models/flightstatemodel.cpp ../../src/models/flightstatemodel.h \
+		../../src/models/timeseriesmodel.h \
+		../../src/utils/flightstateutils.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o flightstatemodel.o ../../src/models/flightstatemodel.cpp
+
+flightstateutils.o: ../../src/utils/flightstateutils.cpp ../../src/utils/flightstateutils.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o flightstateutils.o ../../src/utils/flightstateutils.cpp
+
+timeseriesmodel.o: ../../src/models/timeseriesmodel.cpp ../../src/models/timeseriesmodel.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o timeseriesmodel.o ../../src/models/timeseriesmodel.cpp
+
+timewindowproxymodel.o: ../../src/models/timewindowproxymodel.cpp ../../src/models/timewindowproxymodel.h \
+		../../src/timer.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o timewindowproxymodel.o ../../src/models/timewindowproxymodel.cpp
+
 testcontroller.o: ../../src/testcontroller.cpp ../../src/testcontroller.h \
 		../../src/utils/humidityutils.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o testcontroller.o ../../src/testcontroller.cpp
 
 timer.o: ../../src/timer.cpp ../../src/timer.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o timer.o ../../src/timer.cpp
+
+flightlogfactory.o: ../../src/utils/flightlogfactory.cpp ../../src/utils/flightlogfactory.h \
+		../../src/models/timeseriesmodel.h \
+		../../src/models/flightstatemodel.h \
+		../../src/utils/flightstateutils.h \
+		../../src/utils/timeseriesfactory.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o flightlogfactory.o ../../src/utils/flightlogfactory.cpp
 
 humidityutils.o: ../../src/utils/humidityutils.cpp ../../src/utils/humidityutils.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o humidityutils.o ../../src/utils/humidityutils.cpp
@@ -1205,11 +1176,24 @@ humiditymodel.o: ../../src/models/humiditymodel.cpp ../../src/models/humiditymod
 		../../src/utils/humidityutils.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o humiditymodel.o ../../src/models/humiditymodel.cpp
 
+timeseriesfactory.o: ../../src/utils/timeseriesfactory.cpp ../../src/utils/timeseriesfactory.h \
+		../../src/models/timeseriesmodel.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o timeseriesfactory.o ../../src/utils/timeseriesfactory.cpp
+
 qrc_qml.o: qrc_qml.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o qrc_qml.o qrc_qml.cpp
 
 moc_fermiditycollection.o: moc_fermiditycollection.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_fermiditycollection.o moc_fermiditycollection.cpp
+
+moc_flightstatemodel.o: moc_flightstatemodel.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_flightstatemodel.o moc_flightstatemodel.cpp
+
+moc_timeseriesmodel.o: moc_timeseriesmodel.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_timeseriesmodel.o moc_timeseriesmodel.cpp
+
+moc_timewindowproxymodel.o: moc_timewindowproxymodel.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_timewindowproxymodel.o moc_timewindowproxymodel.cpp
 
 moc_testcontroller.o: moc_testcontroller.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_testcontroller.o moc_testcontroller.cpp

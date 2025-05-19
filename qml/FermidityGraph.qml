@@ -19,9 +19,9 @@ GraphsView {
         axisY.labelTextColor: c1
     }
     axisX: ValueAxis {
-        min: -1200000
+        min: -120000
         max: 0
-        tickInterval: 60000
+        tickInterval: 6000
         subTickCount: 2
         labelDecimals: 1
     }

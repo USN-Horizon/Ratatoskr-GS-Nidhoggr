@@ -129,14 +129,14 @@ ApplicationWindow {
                     Layout.leftMargin: 64
                     Text {
                         id: altitudeTitle
-                        text: qsTr("altitude")
+                        text: qsTr("errors")
                         color: "white"
                         font.pixelSize: 16
                         font.family: "Inter"
                     }
                     Text {
                         id: altitudeValue
-                        text: qsTr("1000m")
+                        text: qsTr("0")
                         color: "white"
                         font.pixelSize: 32
                         font.family: "Hack Nerd Font Mono"
@@ -146,7 +146,7 @@ ApplicationWindow {
                     Layout.leftMargin: 64
                     Text {
                         id: stateTitle
-                        text: qsTr("state")
+                        text: qsTr("energetics")
                         color: "white"
                         font.pixelSize: 16
                         font.family: "Inter"
@@ -161,15 +161,56 @@ ApplicationWindow {
                 }
             }
 
-            FermidityGraph {
-                // model: fmc.testController.humidityList
+            RealtimeGraph {
+                id: realtimeVelocityGraph
+                title: "Velocity (Real-time)"
+                model: velM
+                timer: missionTimer  // Connect to your existing timer
+                windowSize: 60       // Show last 60 seconds of data
+                yAxisMax: 500
+                yAxisMin: -500
+                yAxisInterval: 250
+                yAxisLabel: "Velocity (m/s)"
+                lineColor: "#2CDE85"
                 Layout.fillWidth: true
                 Layout.fillHeight: true
             }
-            FermidityGraph {
-                // model: fmc.testController.humidityList
+
+            RealtimeGraph {
+                id: realtimeAltitudeGraph
+                title: "Altitude (Real-time)"
+                model: altM
+                timer: missionTimer  // Connect to your existing timer
+                windowSize: 60      // Show last 120 seconds of data
+                yAxisMax: 6000
+                yAxisInterval: 1000
+                yAxisLabel: "Altitude (m)"
+                lineColor: "#DBEB00"
                 Layout.fillWidth: true
                 Layout.fillHeight: true
+            }
+
+            // Flight state view
+            FlightStateView {
+                id: flightStateView
+                stateModel: stateM
+                timer: missionTimer
+                windowSize: 60
+                Layout.fillWidth: true
+                Layout.preferredHeight: 170
+
+                Component.onCompleted: {
+                    missionTimer.start()
+
+                    // 2. Reset state model to initial state (Calibrating)
+                    stateM.setCurrentStateByInt(0)
+
+                    // 3. Add some test state data if no real data is available
+                    var currentTime = missionTimer.seconds * 1000
+                    stateM.appendStateData(currentTime, 0) // Calibrating
+                    stateM.appendStateData(currentTime + 1000, 1) // Ready
+                    stateM.appendStateData(currentTime + 2000, 2) // Thrusting
+                }
             }
         }
 
