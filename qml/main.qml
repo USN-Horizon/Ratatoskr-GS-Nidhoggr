@@ -19,11 +19,11 @@ ApplicationWindow {
 
             RowLayout {
                 Image {
-                    Layout.margins: 8
+                    Layout.margins: 0
                     id: horizonLogo
                     source: "./assets/horizon_logo.png"
-                    Layout.preferredWidth: 180
-                    Layout.preferredHeight: 50
+                    Layout.preferredWidth: 230
+                    Layout.preferredHeight: 100
                     Layout.alignment: Qt.AlignCenter
                     fillMode: Image.PreserveAspectFit
                     clip:true
@@ -39,7 +39,7 @@ ApplicationWindow {
             }
 
             RowLayout {
-                Layout.margins: 20
+                Layout.margins: 8
 
                 Rectangle {
                     id: timerContainer
