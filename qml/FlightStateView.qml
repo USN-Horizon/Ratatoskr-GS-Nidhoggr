@@ -125,10 +125,12 @@ Item {
                         Text {
                             text: getStateName(index)
                             anchors.top: parent.bottom
-                            anchors.topMargin: -60
+                            anchors.topMargin: -54 - parent.width / 14
                             anchors.horizontalCenter: parent.horizontalCenter
-                            color: (stateModel && stateModel.currentState === index) ? "#DBEB00" : "#aaaaaa"
-                            font.pixelSize: 16
+                            color: (stateModel && stateModel.currentState === index) ? "#2B2B00" : "#aaaaaa"
+                            opacity: 0.85
+                            font.bold: (stateModel && stateModel.currentState === index)
+                            font.pixelSize: parent.width / 7
 
                             // Helper function to get the name for a state
                             function getStateName(stateIndex) {
