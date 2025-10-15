@@ -1,0 +1,15 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>main.qml</file>
+        <file>qtquickcontrols2.conf</file>
+        <file>FermidityGraph.qml</file>
+        <file>assets/RocketImageTransparent.png</file>
+        <file>RocketVisualization.qml</file>
+        <file>assets/horizon_logo.png</file>
+        <file>AltitudeGraph.qml</file>
+        <file>VelocityGraph.qml</file>
+        <file>RealtimeGraph.qml</file>
+        <file>FlightStateView.qml</file>
+    </qresource>
+</RCC>
