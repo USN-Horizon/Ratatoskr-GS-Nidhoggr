@@ -12,6 +12,7 @@ SOURCES += \
         src/main.cpp \
         src/fermiditycollection.cpp \
         src/models/flightstatemodel.cpp \
+        src/models/tabbarvertical.cpp \
         src/utils/flightstateutils.cpp \
         src/models/timeseriesmodel.cpp \
         src/models/timewindowproxymodel.cpp \
@@ -25,6 +26,7 @@ SOURCES += \
 HEADERS +=  \
     src/fermiditycollection.h \
     src/models/flightstatemodel.h \
+    src/models/tabbarvertical.h \
     src/utils/flightstateutils.h \
     src/models/timeseriesmodel.h \
     src/models/timewindowproxymodel.h \

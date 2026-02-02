@@ -1,7 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>main.qml</file>
-        <file>main.qml</file>
         <file>qtquickcontrols2.conf</file>
         <file>FermidityGraph.qml</file>
         <file>assets/RocketImageTransparent.png</file>
@@ -11,5 +10,6 @@
         <file>VelocityGraph.qml</file>
         <file>RealtimeGraph.qml</file>
         <file>FlightStateView.qml</file>
+        <file>components/TopBar.qml</file>
     </qresource>
 </RCC>
