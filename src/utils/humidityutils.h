@@ -12,7 +12,7 @@ namespace humidity_utils
 
 using HumidityList = QList< TimestampedHumidity >;
 
-auto parseCsv( const QString& a_fileName = R"(C:\Users\Hamsa\Downloads\Humidity_Data.csv)") -> HumidityList;
+auto parseCsv( const QString& a_fileName = "") -> HumidityList;
 }
 
 

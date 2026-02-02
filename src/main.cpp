@@ -4,20 +4,18 @@
 #include <models/timewindowproxymodel.h>
 #include <models/flightstatemodel.h>
 #include <utils/flightlogfactory.h>
-#include "fermiditycollection.h"
+#include "humiditycollection.h"
 #include "timer.h"
 
 int main(int argc, char *argv[])
 {
-    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-
     QApplication app(argc, argv);
 
     QQmlApplicationEngine engine;
 
     engine.addImportPath( "qrc:" );
 
-    FermidityCollection* fmCollection = new FermidityCollection();
+    HumidityCollection* fmCollection = new HumidityCollection();
 
     const QString& flightLogPath = "flightlog.csv";
     TimeSeriesModel* altitudeModel = FlightLogFactory::createModel(flightLogPath, "altitude[m]");
@@ -27,7 +25,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<CountupTimer>("com.horizon.components", 1, 0, "CountupTimer");
     qmlRegisterType<TimeSeriesModel>("com.horizon.components", 1, 0, "AltitudeModel");
     qmlRegisterType<TimeWindowProxyModel>("com.horizon.components", 1, 0, "TimeWindowProxyModel");
-    qmlRegisterType<FermidityCollection>("FermidityCollection", 1, 0, "FermidityCollection");
+    qmlRegisterType<HumidityCollection>("HumidityCollection", 1, 0, "HumidityCollection");
     qmlRegisterType<FlightStateModel>("com.horizon.components", 1, 0, "FlightStateModel");
 
     engine.rootContext()->setContextProperty( "fmc", fmCollection );

@@ -1,9 +1,11 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import Qt.labs.platform as Platform
 import FmControllers
-import FermidityCollection
+import HumidityCollection
 import com.horizon.components
+import "components"
 
 ApplicationWindow {
     visible: true
@@ -11,220 +13,129 @@ ApplicationWindow {
     height: 480
     title: qsTr("Horizon Groundstation")
 
-    RowLayout {
+    // File dialog for importing mission CSV files
+    Platform.FileDialog {
+        id: importDialog
+        title: "Import Mission CSV"
+        nameFilters: ["CSV files (*.csv)", "All files (*)"]
+        fileMode: Platform.FileDialog.OpenFile
+        onAccepted: {
+            var filePath = importDialog.file.toString()
+            // Remove "file://" prefix if present
+            if (filePath.startsWith("file://")) {
+                filePath = filePath.substring(7)
+            }
+            console.log("Importing file:", filePath)
+            handleImport(filePath)
+        }
+        onRejected: {
+            console.log("Import cancelled")
+        }
+    }
 
+    // Function to handle imported file, respond with ui elements based on returned result
+    function handleImport(filePath) {
+        console.log("Processing import from:", filePath)
+        // Call C++ method to handle the import through context porperty
+        var success = fmc.importMissionData(filePath)
+        if (success) {
+            console.log("Import successful!")
+        } else {
+            console.log("Import failed!")
+        }
+    }
+
+    menuBar: MenuBar {
+        Menu {
+            title: qsTr("File")
+            Action {
+                text: qsTr("Import...")
+                onTriggered: importDialog.open()
+            }
+            Action { text: qsTr("Export...") }
+            MenuSeparator { }
+            Action {
+                text: qsTr("Quit")
+                onTriggered: Qt.quit() // TODO: ADD PROMPT
+            }
+        }
+        Menu {
+            title: qsTr("&Edit")
+            Action { text: qsTr("Cu&t") }
+            Action { text: qsTr("&Copy") }
+            Action { text: qsTr("&Paste") }
+        }
+        Menu {
+            title: qsTr("&Help")
+            Action { text: qsTr("&About") }
+        }
+    }
+
+    ColumnLayout {
         anchors.fill: parent
-
-        ColumnLayout {
-
-            RowLayout {
-                Image {
-                    Layout.margins: 0
-                    id: horizonLogo
-                    source: "./assets/horizon_logo.png"
-                    Layout.preferredWidth: 230
-                    Layout.preferredHeight: 100
-                    Layout.alignment: Qt.AlignCenter
-                    fillMode: Image.PreserveAspectFit
-                    clip:true
-                }
-                Text {
-                    id: name
-                    text: qsTr("Horizon Groundstation")
-                    color: "white"
-                    font.pixelSize: 24
-                    font.family: "Inter"
-                    Layout.margins: 20
-                }
-            }
-
-            RowLayout {
-                Layout.margins: 8
-
-                Rectangle {
-                    id: timerContainer
-                    width: 280
-                    height: 130
-                    color: "#1e1e1e"
-                    border.color: "#333333"
-                    radius: 5
-
-                    CountupTimer {
-                        id: missionTimer
-                    }
-
-                    ColumnLayout {
-                        anchors.centerIn: parent
-                        spacing: 5
-
-                        Text {
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            text: "MISSION TIME"
-                            color: "#aaaaaa"
-                            font.pixelSize: 14
-                        }
-
-                        Text {
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            text: missionTimer.timeString
-                            color: "#00ff00"
-                            font.pixelSize: 32
-                            font.bold: true
-                            font.family: "Monospace"
-                        }
-
-                        // Control buttons
-                        RowLayout {
-                            spacing: 8
-
-                            Button {
-                                text: "Start"
-                                onClicked: missionTimer.resume()
-                                width: 100
-                            }
-
-                            Button {
-                                text: "Stop"
-                                onClicked: missionTimer.stop()
-                                width: 100
-                            }
-
-                            Button {
-                                text: "Reset"
-                                onClicked: {
-                                    missionTimer.stop();
-                                    missionTimer.reset();
-                                }
-                                width: 100
-                            }
-                        }
-                    }
+        Layout.fillWidth: true
+        Layout.fillHeight: true
+        Layout.margins: 0
+        spacing: 0
 
 
-                    // Auto-start option (remove if not needed)
-                    Component.onCompleted: {
-                        // Uncomment to auto-start the timer when loaded
-                        // missionTimer.start();
-                    }
-                }
-
-                ColumnLayout {
-                    Layout.leftMargin: 50
-                    Text {
-                        id: connectionTitle
-                        text: qsTr("connection")
-                        color: "white"
-                        font.pixelSize: 16
-                        font.family: "Inter"
-                    }
-                    Text {
-                        id: connectionValue
-                        text: qsTr("Good")
-                        color: "white"
-                        font.pixelSize: 32
-                        font.family: "Hack Nerd Font Mono"
-                    }
-                }
-                ColumnLayout {
-                    Layout.leftMargin: 64
-                    Text {
-                        id: altitudeTitle
-                        text: qsTr("errors")
-                        color: "white"
-                        font.pixelSize: 16
-                        font.family: "Inter"
-                    }
-                    Text {
-                        id: altitudeValue
-                        text: qsTr("0")
-                        color: "white"
-                        font.pixelSize: 32
-                        font.family: "Hack Nerd Font Mono"
-                    }
-                }
-                ColumnLayout {
-                    Layout.leftMargin: 64
-                    Text {
-                        id: stateTitle
-                        text: qsTr("energetics")
-                        color: "white"
-                        font.pixelSize: 16
-                        font.family: "Inter"
-                    }
-                    Text {
-                        id: stateValue
-                        text: qsTr("Ready")
-                        color: "white"
-                        font.pixelSize: 32
-                        font.family: "Hack Nerd Font Mono"
-                    }
-                }
-            }
-
-            RealtimeGraph {
-                id: realtimeVelocityGraph
-                title: "Velocity (Real-time)"
-                model: velM
-                timer: missionTimer  // Connect to your existing timer
-                windowSize: 60       // Show last 60 seconds of data
-                yAxisMax: 500
-                yAxisMin: -500
-                yAxisInterval: 250
-                yAxisLabel: "Velocity (m/s)"
-                lineColor: "#2CDE85"
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-            }
-
-            RealtimeGraph {
-                id: realtimeAltitudeGraph
-                title: "Altitude (Real-time)"
-                model: altM
-                timer: missionTimer  // Connect to your existing timer
-                windowSize: 60      // Show last 120 seconds of data
-                yAxisMax: 6000
-                yAxisInterval: 1000
-                yAxisLabel: "Altitude (m)"
-                lineColor: "#DBEB00"
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-            }
-
-            // Flight state view
-            FlightStateView {
-                id: flightStateView
-                stateModel: stateM
-                timer: missionTimer
-                windowSize: 60
-                Layout.fillWidth: true
-                Layout.preferredHeight: 170
-
-                Component.onCompleted: {
-                    missionTimer.start()
-
-                    // 2. Reset state model to initial state (Calibrating)
-                    stateM.setCurrentStateByInt(0)
-
-                    // 3. Add some test state data if no real data is available
-                    var currentTime = missionTimer.seconds * 1000
-                    stateM.appendStateData(currentTime, 0) // Calibrating
-                    stateM.appendStateData(currentTime + 1000, 1) // Ready
-                    stateM.appendStateData(currentTime + 2000, 2) // Thrusting
-                }
-            }
+        TopBar {
+            id: topBar
+            Layout.fillWidth: true
         }
 
-        ColumnLayout {
-            Image {
-                id: rocket
-                source: "./assets/RocketImageTransparent.png"
-                Layout.preferredWidth: 300
-                Layout.preferredHeight: 900
-                Layout.alignment: Qt.AlignCenter
-                fillMode: Image.PreserveAspectFit
-                clip:true
-            }
-        }
+        RowLayout {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
 
+
+            RowLayout {
+                Layout.alignment: left
+                Layout.fillHeight: true
+                spacing: 0
+
+                TabBar {
+                    id: tabBar
+                    Layout.fillHeight: true
+                    Layout.preferredWidth: 100
+                    Layout.minimumWidth: 100
+                    padding: 0
+                    leftPadding: 0
+                    rightPadding: 0
+
+
+
+                    // Make tabs vertical
+                    contentItem: ListView {
+                        model: tabBar.contentModel
+                        currentIndex: tabBar.currentIndex
+                        spacing: 0
+                        orientation: ListView.Vertical
+                    }
+
+                    TabButton {
+                        text: "Avionics"
+                        rotation: 0
+                        implicitHeight: tabBar.height / 2
+                        width: tabBar.width
+                    }
+                    TabButton {
+                        text: "Payload"
+                        implicitHeight: tabBar.height / 2
+                        width: tabBar.width
+                    }
+                }
+
+                StackLayout {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    currentIndex: tabBar.currentIndex
+
+                    AvionicsMain {}
+                    PayloadMain {}
+                }
+            }
+
+        }
     }
 }
