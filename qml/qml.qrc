@@ -2,14 +2,12 @@
     <qresource prefix="/">
         <file>main.qml</file>
         <file>qtquickcontrols2.conf</file>
-        <file>FermidityGraph.qml</file>
         <file>assets/RocketImageTransparent.png</file>
-        <file>RocketVisualization.qml</file>
         <file>assets/horizon_logo.png</file>
-        <file>AltitudeGraph.qml</file>
-        <file>VelocityGraph.qml</file>
-        <file>RealtimeGraph.qml</file>
-        <file>FlightStateView.qml</file>
+        <file>components/RealtimeGraph.qml</file>
+        <file>components/FlightStateView.qml</file>
         <file>components/TopBar.qml</file>
+        <file>components/AvionicsMain.qml</file>
+        <file>components/PayloadMain.qml</file>
     </qresource>
 </RCC>

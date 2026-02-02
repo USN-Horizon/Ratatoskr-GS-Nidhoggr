@@ -150,30 +150,5 @@ Item {
                 }
             }
         }
-/*
-        // State history graph
-        Rectangle {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            Layout.leftMargin: 10
-            Layout.rightMargin: 10
-            Layout.bottomMargin: 10
-            color: "#1e1e1e"
-            border.color: "#333333"
-            radius: 5
-
-            RealtimeGraph {
-                id: stateGraph
-                anchors.fill: parent
-                anchors.margins: 5
-                title: "State History"
-                model: stateModel
-                timer: root.timer
-                windowSize: root.windowSize
-                yAxisMax: 7
-                yAxisLabel: "State"
-                lineColor: "#f39c12" // Orange
-            }
-        }*/
     }
 }

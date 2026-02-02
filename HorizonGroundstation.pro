@@ -10,13 +10,12 @@ INCLUDEPATH = src
 
 SOURCES += \
         src/main.cpp \
-        src/fermiditycollection.cpp \
+        src/humiditycollection.cpp \
         src/models/flightstatemodel.cpp \
-        src/models/tabbarvertical.cpp \
         src/utils/flightstateutils.cpp \
         src/models/timeseriesmodel.cpp \
         src/models/timewindowproxymodel.cpp \
-        src/testcontroller.cpp \
+        src/humiditycontroller.cpp \
         src/timer.cpp \
         src/utils/flightlogfactory.cpp \
         src/utils/humidityutils.cpp \
@@ -24,13 +23,12 @@ SOURCES += \
         src/utils/timeseriesfactory.cpp
 
 HEADERS +=  \
-    src/fermiditycollection.h \
+    src/humiditycollection.h \
     src/models/flightstatemodel.h \
-    src/models/tabbarvertical.h \
     src/utils/flightstateutils.h \
     src/models/timeseriesmodel.h \
     src/models/timewindowproxymodel.h \
-    src/testcontroller.h \
+    src/humiditycontroller.h \
     src/timer.h \
     src/utils/flightlogfactory.h \
     src/utils/humidityutils.h \

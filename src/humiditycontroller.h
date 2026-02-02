@@ -3,7 +3,7 @@
 #include <QtQml/qqml.h>
 #include "utils/humidityutils.h"
 
-class TestController : public QObject
+class HumidityController : public QObject
 {
     Q_OBJECT
     QML_ELEMENT
@@ -11,7 +11,7 @@ class TestController : public QObject
     Q_PROPERTY(humidity_utils::HumidityList humidityList READ humidityList WRITE setHumidityList NOTIFY humidityListChanged FINAL)
 
 public:
-    explicit TestController(QObject *parent = nullptr);
+    explicit HumidityController(QObject *parent = nullptr);
 
     QString name() const;
     void setname(const QString &newName);
