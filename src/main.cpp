@@ -17,9 +17,14 @@ int main(int argc, char *argv[])
 
     HumidityCollection* fmCollection = new HumidityCollection();
 
-    const QString& flightLogPath = "flightlog.csv";
+    const QString& flightLogPath = "flightlog.csv"; // TODO: no hardie codie
+
+    TimeSeriesModel* accelerationModel = FlightLogFactory::createModel(flightLogPath, "acceleration[m/s]");
+    TimeSeriesModel* rotationModel = FlightLogFactory::createModel(flightLogPath, "rotation[deg/s]");
+    TimeSeriesModel* pressureModel = FlightLogFactory::createModel(flightLogPath, "pressure[m/s]");
     TimeSeriesModel* altitudeModel = FlightLogFactory::createModel(flightLogPath, "altitude[m]");
     TimeSeriesModel* velocityModel = FlightLogFactory::createModel(flightLogPath, "velocity[m/s]");
+
     FlightStateModel* stateModel = FlightLogFactory::createStateModel(flightLogPath);
 
     qmlRegisterType<CountupTimer>("com.horizon.components", 1, 0, "CountupTimer");
@@ -29,8 +34,13 @@ int main(int argc, char *argv[])
     qmlRegisterType<FlightStateModel>("com.horizon.components", 1, 0, "FlightStateModel");
 
     engine.rootContext()->setContextProperty( "fmc", fmCollection );
-    engine.rootContext()->setContextProperty( "altM", altitudeModel );
-    engine.rootContext()->setContextProperty( "velM", velocityModel );
+
+    engine.rootContext()->setContextProperty( "accelerationM", accelerationModel);
+    engine.rootContext()->setContextProperty( "rotationM", rotationModel );
+    engine.rootContext()->setContextProperty( "pressureM", pressureModel );
+    engine.rootContext()->setContextProperty( "altitudeM", altitudeModel );
+    engine.rootContext()->setContextProperty( "velocityM", velocityModel );
+
     engine.rootContext()->setContextProperty( "stateM", stateModel );
 
     // Connect to state transitions to log them
