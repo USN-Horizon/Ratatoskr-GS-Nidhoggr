@@ -14,6 +14,7 @@ Item {
     property alias model: timeWindow.sourceModel
     property alias timer: timeWindow.timer
     property alias windowSize: timeWindow.windowSize
+    property string unitText: ""
     property color lineColor: "#2CDE85"
 
     // Internal time window proxy model
@@ -38,7 +39,7 @@ Item {
             left: parent.left
             right: parent.right
             bottom: parent.bottom
-            margins: 10
+            //margins: 10
         }
         spacing: 10
 
@@ -113,7 +114,7 @@ Item {
             LineSeries {
                 id: lineSeries
                 name: "Data"
-                width: 2 // Slightly thicker line for better visibility
+                width: 2
 
                 // Map model data to series
                 XYModelMapper {
@@ -128,6 +129,7 @@ Item {
 
         Column {
             id: valueColumn
+            width: 120
 
             anchors {
                 top: parent.top
@@ -147,16 +149,17 @@ Item {
 
             Text {
                 text: {
+                        var _ = timeWindow.currentTime; // this line is appearently needed to keep component reactive (like in vue..... :( )
                         if (timeWindow.rowCount() > 0) {
                             var lastRow = timeWindow.rowCount() - 1;
                             var value = timeWindow.data(timeWindow.index(lastRow, 1));
-                            return value !== undefined ? value.toFixed(2) : "No Value";
+                            return value !== undefined ? value.toFixed(1) + unitText : "---";
                         }
-                        return "No Value";
+                        return "---";
                     }
 
                 color: "#00ff00"
-                font.pixelSize: 16
+                font.pixelSize: 20
                 font.family: "Monospace"
             }
         }

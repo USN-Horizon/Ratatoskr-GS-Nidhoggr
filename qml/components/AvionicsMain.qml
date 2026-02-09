@@ -21,10 +21,11 @@ RowLayout {
             model: accelerationM
             timer: topBar.missionTimer
             windowSize: 60       // Show last 60 seconds of data
-            yAxisMax: 500
-            yAxisMin: -500
-            yAxisInterval: 250
+            yAxisMax: 300
+            yAxisMin: -300
+            yAxisInterval: 300
             yAxisLabel: "Acceleration (m/s)^2"
+            unitText: "(m/s)²"
             lineColor: "#2CDE85"
             Layout.fillWidth: true
             Layout.fillHeight: true
@@ -36,9 +37,10 @@ RowLayout {
             model: rotationM
             timer: topBar.missionTimer
             windowSize: 60      // Show last 120 seconds of data
-            yAxisMax: 6000
-            yAxisInterval: 1000
+            yAxisMax: 1000
+            yAxisInterval: 500
             yAxisLabel: "Rotation (deg/s)"
+            unitText: "deg/s"
             lineColor: "#DBEB00"
             Layout.fillWidth: true
             Layout.fillHeight: true
@@ -50,9 +52,10 @@ RowLayout {
             model: pressureM
             timer: topBar.missionTimer
             windowSize: 60      // Show last 120 seconds of data
-            yAxisMax: 6000
-            yAxisInterval: 1000
-            yAxisLabel: "Pressure (Pa)"
+            yAxisMax: 100
+            yAxisInterval: 50
+            yAxisLabel: "Pressure (kPa)"
+            unitText: "kPa"
             lineColor: "#DBEB00"
             Layout.fillWidth: true
             Layout.fillHeight: true
@@ -65,8 +68,9 @@ RowLayout {
             timer: topBar.missionTimer
             windowSize: 60      // Show last 120 seconds of data
             yAxisMax: 6000
-            yAxisInterval: 1000
+            yAxisInterval: 2000
             yAxisLabel: "Altitude (m)"
+            unitText: "m"
             lineColor: "#DBEB00"
             Layout.fillWidth: true
             Layout.fillHeight: true
@@ -78,9 +82,11 @@ RowLayout {
             model: velocityM
             timer: topBar.missionTimer
             windowSize: 60      // Show last 120 seconds of data
-            yAxisMax: 800
-            yAxisInterval: 1000
+            yAxisMax: 500
+            yAxisMin: -500
+            yAxisInterval: 500
             yAxisLabel: "Speed (m/s)"
+            unitText: "m/s"
             lineColor: "#DBEB00"
             Layout.fillWidth: true
             Layout.fillHeight: true
