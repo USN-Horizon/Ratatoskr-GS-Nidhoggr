@@ -87,8 +87,8 @@ Item {
             // X-axis (time)
             axisX: ValueAxis {
                 id: axisX
-                min: 0
-                max: timeWindow.windowSize * 1000 // Convert to milliseconds
+                min: timeWindow.windowSize * 1000 * -1 // Convert to milliseconds
+                max: 0
                 tickInterval: timeWindow.windowSize * 1000 / 6
                 subTickCount: 1
                 labelDecimals: 0
@@ -96,7 +96,7 @@ Item {
 
                 // Custom label format to show as "X sec ago"
                 labelFormat: function(value) {
-                    return (value / 1000).toFixed(0) + "s";
+                    return (-value / 1000).toFixed(0) + "s";
                 }
             }
 

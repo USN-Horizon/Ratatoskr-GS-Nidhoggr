@@ -118,8 +118,8 @@ QVariant TimeWindowProxyModel::data(const QModelIndex &index, int role) const
             // Calculate time relative to current time
             double currentTime = m_timer ? m_timer->seconds() * 1000.0 : 0.0;
 
-            // Return time as "milliseconds ago"
-            return currentTime - timeValue;
+            // Return negative offset: 0 = newest, -windowSize*1000 = oldest
+            return timeValue - currentTime;
         }
     }
 
