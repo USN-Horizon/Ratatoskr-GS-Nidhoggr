@@ -5,6 +5,7 @@
 #include <models/flightstatemodel.h>
 #include <utils/flightlogfactory.h>
 #include "humiditycollection.h"
+#include "missionmanager.h"
 #include "timer.h"
 
 int main(int argc, char *argv[])
@@ -17,15 +18,18 @@ int main(int argc, char *argv[])
 
     HumidityCollection* fmCollection = new HumidityCollection();
 
-    const QString& flightLogPath = "flightlog.csv"; // TODO: no hardie codie
+    FlightStateModel* stateModel = FlightLogFactory::createStateModel();
 
-    TimeSeriesModel* accelerationModel = FlightLogFactory::createModel(flightLogPath, "acceleration[m/s]");
-    TimeSeriesModel* rotationModel = FlightLogFactory::createModel(flightLogPath, "rotation[deg/s]");
-    TimeSeriesModel* pressureModel = FlightLogFactory::createModel(flightLogPath, "pressure[m/s]");
-    TimeSeriesModel* altitudeModel = FlightLogFactory::createModel(flightLogPath, "altitude[m]");
-    TimeSeriesModel* velocityModel = FlightLogFactory::createModel(flightLogPath, "velocity[m/s]");
+    FlightModels models = {
+        FlightLogFactory::createModel("acceleration[m/s]"),
+        FlightLogFactory::createModel("rotation[deg/s]"),
+        FlightLogFactory::createModel("pressure[m/s]"),
+        FlightLogFactory::createModel("altitude[m]"),
+        FlightLogFactory::createModel("velocity[m/s]"),
+        stateModel
+    };
 
-    FlightStateModel* stateModel = FlightLogFactory::createStateModel(flightLogPath);
+    MissionManager* missionManager = new MissionManager(models);
 
     qmlRegisterType<CountupTimer>("com.horizon.components", 1, 0, "CountupTimer");
     qmlRegisterType<TimeSeriesModel>("com.horizon.components", 1, 0, "AltitudeModel");
@@ -33,13 +37,16 @@ int main(int argc, char *argv[])
     qmlRegisterType<HumidityCollection>("HumidityCollection", 1, 0, "HumidityCollection");
     qmlRegisterType<FlightStateModel>("com.horizon.components", 1, 0, "FlightStateModel");
 
+
+    engine.rootContext()->setContextProperty("missionManager", missionManager );
+
     engine.rootContext()->setContextProperty( "fmc", fmCollection );
 
-    engine.rootContext()->setContextProperty( "accelerationM", accelerationModel);
-    engine.rootContext()->setContextProperty( "rotationM", rotationModel );
-    engine.rootContext()->setContextProperty( "pressureM", pressureModel );
-    engine.rootContext()->setContextProperty( "altitudeM", altitudeModel );
-    engine.rootContext()->setContextProperty( "velocityM", velocityModel );
+    engine.rootContext()->setContextProperty( "accelerationM", models.acceleration);
+    engine.rootContext()->setContextProperty( "rotationM", models.rotation);
+    engine.rootContext()->setContextProperty( "pressureM", models.pressure);
+    engine.rootContext()->setContextProperty( "altitudeM", models.altitude);
+    engine.rootContext()->setContextProperty( "velocityM", models.velocity);
 
     engine.rootContext()->setContextProperty( "stateM", stateModel );
 

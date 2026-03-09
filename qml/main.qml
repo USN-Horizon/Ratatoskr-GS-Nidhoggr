@@ -37,7 +37,7 @@ ApplicationWindow {
     function handleImport(filePath) {
         console.log("Processing import from:", filePath)
         // Call C++ method to handle the import through context porperty
-        var success = fmc.importMissionData(filePath)
+        var success = missionManager.importMissionData(filePath)
         if (success) {
             console.log("Import successful!")
         } else {
@@ -46,6 +46,17 @@ ApplicationWindow {
     }
 
     menuBar: MenuBar {
+        background: Rectangle {
+            color: palette.button
+            Text {
+                anchors.right: parent.right
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.rightMargin: 12
+                text: missionManager.modeText
+                color: palette.buttonText
+                font.pixelSize: 12
+            }
+        }
         Menu {
             title: qsTr("File")
             Action {

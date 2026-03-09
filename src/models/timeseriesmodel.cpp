@@ -1,23 +1,44 @@
 #include "timeseriesmodel.h"
-#include <QStandardItem>
 
 TimeSeriesModel::TimeSeriesModel(QObject *parent)
-    : QStandardItemModel(0, COLUMN_COUNT, parent)
+    : QAbstractListModel(parent),
+    m_xLabel("Time (ms)"),
+    m_yLabel("Value")
+{}
+
+int TimeSeriesModel::rowCount(const QModelIndex &parent) const
 {
-    // Set default horizontal header labels
-    setHorizontalHeaderLabels({"Time (ms)", "Value"});
+    if (parent.isValid()) return 0;
+    return m_xData.size();
 }
 
-TimeSeriesModel::TimeSeriesModel(int rows, int columns, QObject *parent)
-    : QStandardItemModel(rows, columns, parent)
+int TimeSeriesModel::columnCount(const QModelIndex &parent) const
 {
-    // Set default horizontal header labels
-    setHorizontalHeaderLabels({"Time (ms)", "Value"});
+    if (parent.isValid()) return 0;
+    return COLUMN_COUNT; // 2: column 0 = X (time), column 1 = Y (value)
+}
+
+QVariant TimeSeriesModel::data(const QModelIndex &index, int role) const
+{
+    if (!index.isValid() || index.row() < 0 || index.row() >= m_xData.size())
+        return QVariant();
+
+    switch (role) {
+    case Qt::DisplayRole:
+        return index.column() == Y_COLUMN ? m_yData.at(index.row())
+                                          : m_xData.at(index.row());
+    case XRole:
+        return m_xData.at(index.row());
+    case YRole:
+        return m_yData.at(index.row());
+    default:
+        return QVariant();
+    }
 }
 
 QHash<int, QByteArray> TimeSeriesModel::roleNames() const
 {
-    QHash<int, QByteArray> roles = QStandardItemModel::roleNames();
+    QHash<int, QByteArray> roles = QAbstractListModel::roleNames();
     roles[XRole] = "x";
     roles[YRole] = "y";
     return roles;
@@ -25,80 +46,64 @@ QHash<int, QByteArray> TimeSeriesModel::roleNames() const
 
 void TimeSeriesModel::appendData(qreal x, qreal y)
 {
-    int row = rowCount();
-
-    // Create items for new row
-    QStandardItem *xItem = new QStandardItem();
-    xItem->setData(x, Qt::DisplayRole);
-    xItem->setData(x, XRole);
-
-    QStandardItem *yItem = new QStandardItem();
-    yItem->setData(y, Qt::DisplayRole);
-    yItem->setData(y, YRole);
-
-    // Create a row with the items
-    QList<QStandardItem*> rowItems;
-    rowItems << xItem << yItem;
-
-    // Append the row
-    appendRow(rowItems);
+    const int row = m_xData.size();
+    beginInsertRows(QModelIndex(), row, row);
+    m_xData.append(x);
+    m_yData.append(y);
+    endInsertRows();
 }
 
 void TimeSeriesModel::removeData(int row)
 {
-    if (row >= 0 && row < rowCount()) {
-        removeRow(row);
-    }
+    if (row < 0 || row >= m_xData.size()) return;
+    beginRemoveRows(QModelIndex(), row, row);
+    m_xData.removeAt(row);
+    m_yData.removeAt(row);
+    endRemoveRows();
 }
 
 QVariantMap TimeSeriesModel::get(int row) const
 {
     QVariantMap map;
-    if (row >= 0 && row < rowCount()) {
-        QModelIndex xIndex = index(row, X_COLUMN);
-        QModelIndex yIndex = index(row, Y_COLUMN);
-        map["x"] = data(xIndex, Qt::DisplayRole).toReal();
-        map["y"] = data(yIndex, Qt::DisplayRole).toReal();
+    if (row >= 0 && row < m_xData.size()) {
+        map["x"] = m_xData.at(row);
+        map["y"] = m_yData.at(row);
     }
     return map;
 }
 
-void TimeSeriesModel::setColumnLabels(const QString& xLabel, const QString& yLabel)
+void TimeSeriesModel::setColumnLabels(const QString &xLabel, const QString &yLabel)
 {
-    setHorizontalHeaderLabels({xLabel, yLabel});
+    m_xLabel = xLabel;
+    m_yLabel = yLabel;
 }
 
-void TimeSeriesModel::setData(const QVector<qreal>& xValues, const QVector<qreal>& yValues)
+void TimeSeriesModel::setData(const QVector<qreal> &xValues, const QVector<qreal> &yValues)
 {
-    // Clear existing data
-    clearData();
+    const int newCount = qMin(xValues.size(), yValues.size());
+    const int oldCount = m_xData.size();
 
-    // Make sure both vectors have the same size
-    int count = qMin(xValues.size(), yValues.size());
+    // Remove old rows first so the view never holds stale indices
+    if (oldCount > 0) {
+        beginRemoveRows(QModelIndex(), 0, oldCount - 1);
+        m_xData.clear();
+        m_yData.clear();
+        endRemoveRows();
+    }
 
-    // Reserve rows for better performance
-    setRowCount(count);
-
-    // Add data from the vectors
-    for (int i = 0; i < count; ++i) {
-        qreal x = xValues.at(i);
-        qreal y = yValues.at(i);
-
-        // Create and set items for X and Y columns
-        QStandardItem *xItem = new QStandardItem();
-        xItem->setData(x, Qt::DisplayRole);
-        xItem->setData(x, XRole);
-
-        QStandardItem *yItem = new QStandardItem();
-        yItem->setData(y, Qt::DisplayRole);
-        yItem->setData(y, YRole);
-
-        setItem(i, X_COLUMN, xItem);
-        setItem(i, Y_COLUMN, yItem);
+    if (newCount > 0) {
+        beginInsertRows(QModelIndex(), 0, newCount - 1);
+        m_xData = xValues.mid(0, newCount);
+        m_yData = yValues.mid(0, newCount);
+        endInsertRows();
     }
 }
 
 void TimeSeriesModel::clearData()
 {
-    removeRows(0, rowCount());
+    if (m_xData.isEmpty()) return;
+    beginRemoveRows(QModelIndex(), 0, m_xData.size() - 1);
+    m_xData.clear();
+    m_yData.clear();
+    endRemoveRows();
 }

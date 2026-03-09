@@ -22,6 +22,8 @@ RowLayout {
         border.color: "#333333"
         radius: 5
 
+        visible: missionManager.isPlayback
+
         RowLayout {
             id: missionRow
             anchors.centerIn: parent
@@ -58,6 +60,22 @@ RowLayout {
                     onClicked: {
                         missionTimer.stop();
                         missionTimer.reset();
+                    }
+                }
+                Button {
+                    icon.source: "qrc:/icons/close.svg"
+                    icon.width: 16
+                    icon.height: 16
+                    onClicked: {
+                        missionTimer.stop();
+                        missionTimer.reset();
+                        missionManager.startCapture();
+                    }
+                    background: Rectangle {
+                        implicitWidth: 40
+                        implicitHeight: 40
+                        color: "#2e2e32"
+                        radius: height / 2
                     }
                 }
             }

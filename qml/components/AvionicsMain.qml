@@ -247,11 +247,6 @@ RowLayout {
             Layout.fillWidth: true
             Layout.preferredHeight: 170
             Layout.maximumHeight: 170
-
-            Component.onCompleted: {
-                topBar.missionTimer.start()
-                stateM.setCurrentStateByInt(0)
-            }
         }
     }
 }
