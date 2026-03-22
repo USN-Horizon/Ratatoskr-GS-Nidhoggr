@@ -46,18 +46,12 @@ public:
     static TimeSeriesModel* createBatteryModel(const QString& flightLogPath);
 
     /**
-     * @brief Create a time series model for latitude data
+     * @brief Create location model for location data
      * @param flightLogPath Path to the flight log CSV
-     * @return A new TimeSeriesModel populated with latitude data
+     * @return A new TimeSeriesModel populated with battery data
      */
-    static TimeSeriesModel* createLatitudeModel(const QString& flightLogPath);
+    static LocationModel* createLocationModel();
 
-    /**
-     * @brief Create a time series model for longitude data
-     * @param flightLogPath Path to the flight log CSV
-     * @return A new TimeSeriesModel populated with longitude data
-     */
-    static TimeSeriesModel* createLongitudeModel(const QString& flightLogPath);
 
     /**
      * @brief Create a time series model for any column in the flight log

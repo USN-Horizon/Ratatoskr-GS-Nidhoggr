@@ -63,72 +63,17 @@ TimeSeriesModel* FlightLogFactory::createBatteryModel(const QString& flightLogPa
     return model;
 }
 
-TimeSeriesModel* FlightLogFactory::createLatitudeModel(const QString& flightLogPath)
-{
-    // Use custom processing to convert deg/10000 to degrees
-    QVector<qreal> xValues;
-    QVector<qreal> yValues;
-
-    TimeSeriesFactory::processCsv(
-        flightLogPath,
-        [](const QStringList& fields, int lineNumber, QVector<qreal>& xValues, QVector<qreal>& yValues) {
-            if (fields.size() >= 5) {
-                bool okTime, okLat;
-                qreal timeValue = fields[0].toDouble(&okTime);  // seconds column
-                qreal latValue = fields[3].toDouble(&okLat);  // lat[deg/10000] column
-
-                if (okTime && okLat) {
-                    // Convert seconds to milliseconds and deg/10000 to degrees
-                    xValues.append(timeValue * 1000.0);
-                    yValues.append(latValue / 10000.0); // Convert to degrees
-                }
-            }
-        },
-        xValues,
-        yValues
-        );
-
-    TimeSeriesModel* model = new TimeSeriesModel();
-    model->setData(xValues, yValues);
-    model->setColumnLabels("Time (ms)", "Latitude (deg)");
-    return model;
-}
-
-TimeSeriesModel* FlightLogFactory::createLongitudeModel(const QString& flightLogPath)
-{
-    // Use custom processing to convert deg/10000 to degrees
-    QVector<qreal> xValues;
-    QVector<qreal> yValues;
-
-    TimeSeriesFactory::processCsv(
-        flightLogPath,
-        [](const QStringList& fields, int lineNumber, QVector<qreal>& xValues, QVector<qreal>& yValues) {
-            if (fields.size() >= 6) {
-                bool okTime, okLon;
-                qreal timeValue = fields[0].toDouble(&okTime);  // seconds column
-                qreal lonValue = fields[4].toDouble(&okLon);  // lon[deg/10000] column
-
-                if (okTime && okLon) {
-                    // Convert seconds to milliseconds and deg/10000 to degrees
-                    xValues.append(timeValue * 1000.0);
-                    yValues.append(lonValue / 10000.0); // Convert to degrees
-                }
-            }
-        },
-        xValues,
-        yValues
-        );
-
-    TimeSeriesModel* model = new TimeSeriesModel();
-    model->setData(xValues, yValues);
-    model->setColumnLabels("Time (ms)", "Longitude (deg)");
-    return model;
-}
-
 FlightStateModel* FlightLogFactory::createStateModel()
 {
     // Create a new model
     FlightStateModel* model = new FlightStateModel();
+    return model;
+}
+
+LocationModel* FlightLogFactory::createLocationModel()
+{
+    // Create a new model
+    LocationModel* model = new LocationModel();
     return model;
 }
 
@@ -245,10 +190,6 @@ TimeSeriesModel* FlightLogFactory::createModelFromCsv(const QString& flightLogPa
         return createVelocityModel(flightLogPath);
     } else if (columnName == "battery[decivolts]") {
         return createBatteryModel(flightLogPath);
-    } else if (columnName == "lat[deg/10000]") {
-        return createLatitudeModel(flightLogPath);
-    } else if (columnName == "lon[deg/10000]") {
-        return createLongitudeModel(flightLogPath);
     }
 
     // Default case: just use the column as-is

@@ -27,6 +27,7 @@ bool MissionManager::importMissionData(const QString &path)
     FlightLogFactory::populateVelocity(m_models.velocity, data);
     if (m_models.state)
         FlightLogFactory::populateState(m_models.state, data);
+    FlightLogFactory::populateLocation(m_models.location, data);
 
     m_state = PlaybackState {
         path

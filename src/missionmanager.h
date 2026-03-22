@@ -5,6 +5,7 @@
 #include <QString>
 #include "models/timeseriesmodel.h"
 #include "models/flightstatemodel.h"
+#include "models/locationmodel.h"
 
 struct FlightModels {
     TimeSeriesModel* acceleration;
@@ -12,6 +13,7 @@ struct FlightModels {
     TimeSeriesModel* pressure;
     TimeSeriesModel* altitude;
     TimeSeriesModel* velocity;
+    LocationModel* location;
     FlightStateModel* state;
 };
 

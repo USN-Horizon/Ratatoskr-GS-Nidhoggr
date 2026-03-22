@@ -19,6 +19,7 @@ int main(int argc, char *argv[])
     HumidityCollection* fmCollection = new HumidityCollection();
 
     FlightStateModel* stateModel = FlightLogFactory::createStateModel();
+    LocationModel* locationModel = FlightLogFactory::createLocationModel();
 
     FlightModels models = {
         FlightLogFactory::createModel("acceleration[m/s]"),
@@ -26,6 +27,7 @@ int main(int argc, char *argv[])
         FlightLogFactory::createModel("pressure[m/s]"),
         FlightLogFactory::createModel("altitude[m]"),
         FlightLogFactory::createModel("velocity[m/s]"),
+        locationModel,
         stateModel
     };
 
@@ -48,6 +50,7 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty( "altitudeM", models.altitude);
     engine.rootContext()->setContextProperty( "velocityM", models.velocity);
 
+    engine.rootContext()->setContextProperty("locationM", locationModel);
     engine.rootContext()->setContextProperty( "stateM", stateModel );
 
     // Connect to state transitions to log them
