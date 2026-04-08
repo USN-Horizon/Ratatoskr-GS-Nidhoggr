@@ -25,7 +25,7 @@ Item {
             var n = timeWindow.rowCount()
             if (n > 0) {
                 var point = timeWindow.get(n - 1)
-                map.center = QtPositioning.coordinate(point.y_lat, point.y_lon)
+                if (point.y_lat && point.y_lon) map.center = QtPositioning.coordinate(point.y_lat, point.y_lon)
             }
         }
     }
