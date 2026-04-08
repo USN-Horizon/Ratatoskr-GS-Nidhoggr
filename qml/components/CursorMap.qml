@@ -14,6 +14,19 @@ Item {
     property alias model: timeWindow.sourceModel
     property alias timer: timeWindow.timer
 
+    property real currentLat: 0
+    property real currentLon: 0
+
+    function formatCoord(deg, posLabel, negLabel) {
+        var dir = deg >= 0 ? posLabel : negLabel
+        var abs = Math.abs(deg)
+        var d = Math.floor(abs)
+        var minFrac = (abs - d) * 60
+        var m = Math.floor(minFrac)
+        var s = ((minFrac - m) * 60).toFixed(1)
+        return d + "° " + m + "' " + s + "\" " + dir
+    }
+
     // Internal time window proxy model
     TimeWindowProxyModel {
         id: timeWindow
@@ -25,7 +38,11 @@ Item {
             var n = timeWindow.rowCount()
             if (n > 0) {
                 var point = timeWindow.get(n - 1)
-                if (point.y_lat && point.y_lon) map.center = QtPositioning.coordinate(point.y_lat, point.y_lon)
+                if (point.y_lat && point.y_lon) {
+                    root.currentLat = point.y_lat
+                    root.currentLon = point.y_lon
+                    map.center = QtPositioning.coordinate(point.y_lat, point.y_lon)
+                }
             }
         }
     }
@@ -77,13 +94,25 @@ Item {
         RowLayout {
             Text {
             id: coordsValue
-            text: qsTr("34N 34S")
+            text: root.currentLat === 0 && root.currentLon === 0
+                ? qsTr("No data")
+                : root.formatCoord(root.currentLat, "N", "S") + "  " + root.formatCoord(root.currentLon, "E", "W")
             color: "white"
             font.pixelSize: 16
             }
 
             Button {
             text: qsTr("📋")
+            onClicked: {
+                clipHelper.text = root.currentLat.toFixed(6) + ", " + root.currentLon.toFixed(6)
+                clipHelper.selectAll()
+                clipHelper.copy()
+            }
+            }
+
+            TextEdit {
+                id: clipHelper
+                visible: false
             }
 
         }
