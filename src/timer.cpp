@@ -12,6 +12,8 @@ CountupTimer::CountupTimer(QObject *parent)
 
 double CountupTimer::seconds() const
 {
+    if (!m_running)
+        return m_startValue + m_pausedElapsed;
 
     // Calculate exact time difference in seconds
     // time is shown as the difference between m_startTime (constant) and currentDateTime
@@ -67,11 +69,11 @@ void CountupTimer::resume()
 void CountupTimer::stop()
 {
     if (m_running) {
+        // Save elapsed time before flipping m_running, so seconds() still reads live time
+        m_pausedElapsed = m_startTime.msecsTo(QDateTime::currentDateTime()) / 1000.0;
+
         m_running = false;
         m_updateTimer.stop();
-
-        // Save current value for resume
-        m_pausedElapsed = seconds() - m_startValue;
 
         emit runningChanged();
         emit secondsChanged();
