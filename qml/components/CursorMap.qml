@@ -17,6 +17,10 @@ Item {
     property real currentLat: 0
     property real currentLon: 0
 
+    ListModel {
+        id: trailModel
+    }
+
     function formatCoord(deg, posLabel, negLabel) {
         var dir = deg >= 0 ? posLabel : negLabel
         var abs = Math.abs(deg)
@@ -33,8 +37,16 @@ Item {
         invertTimeAxis: true
         windowSize: 30
 
+        property real lastSeenTime: 0
+
         // Monitor changes to ensure graph updates
         onCurrentTimeChanged: {
+            // Detect reset: time jumped backwards → clear trail
+            if (currentTime < lastSeenTime - 1) {
+                trailModel.clear()
+            }
+            lastSeenTime = currentTime
+
             var n = timeWindow.rowCount()
             if (n > 0) {
                 var point = timeWindow.get(n - 1)
@@ -42,6 +54,13 @@ Item {
                     root.currentLat = point.y_lat
                     root.currentLon = point.y_lon
                     map.center = QtPositioning.coordinate(point.y_lat, point.y_lon)
+
+                    // Append to trail if this is a new coordinate
+                    var count = trailModel.count
+                    var last = count > 0 ? trailModel.get(count - 1) : null
+                    if (!last || last.lat !== point.y_lat || last.lon !== point.y_lon) {
+                        trailModel.append({ lat: point.y_lat, lon: point.y_lon })
+                    }
                 }
             }
         }
@@ -67,6 +86,50 @@ Item {
             //margins: 10
         }
 
+        MapItemView {
+            model: trailModel
+            delegate: MapQuickItem {
+                coordinate: QtPositioning.coordinate(model.lat, model.lon)
+                anchorPoint.x: 3
+                anchorPoint.y: 3
+                sourceItem: Rectangle {
+                    width: 6
+                    height: 6
+                    radius: 3
+                    color: "#442CDE85"
+                    border.color: "#662CDE85"
+                    border.width: 1
+                }
+            }
+        }
+
+        MapItemView {
+            model: timeWindow
+            delegate: MapQuickItem {
+                coordinate: QtPositioning.coordinate(model.y_lat, model.y_lon)
+                anchorPoint.x: 4
+                anchorPoint.y: 4
+                sourceItem: Rectangle {
+                    width: 8
+                    height: 8
+                    radius: 4
+                    color: "#882CDE85"
+                    border.color: "#2CDE85"
+                    border.width: 1
+                }
+            }
+        }
+
+        Rectangle {
+            anchors.centerIn: parent
+            width: 10
+            height: 10
+            radius: 5
+            color: "#dd31f904"  // Semi-transparent
+            border.color: "#013300"
+            border.width: 1
+        }
+
 
         Rectangle {
         anchors.top: parent.top
@@ -86,7 +149,7 @@ Item {
 
         Text {
             id: coordsLabel
-            text: qsTr("Coordinates")
+            text: qsTr("Last Recieved Coordinates")
             color: "#888888"
             font.pixelSize: 12
         }
