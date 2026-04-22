@@ -27,6 +27,7 @@ int main(int argc, char *argv[])
         FlightLogFactory::createModel("pressure[m/s]"),
         FlightLogFactory::createModel("altitude[m]"),
         FlightLogFactory::createModel("velocity[m/s]"),
+        FlightLogFactory::createModel("cosmic_radiation[c/m]"),
         locationModel,
         stateModel
     };
@@ -49,6 +50,7 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty( "pressureM", models.pressure);
     engine.rootContext()->setContextProperty( "altitudeM", models.altitude);
     engine.rootContext()->setContextProperty( "velocityM", models.velocity);
+    engine.rootContext()->setContextProperty( "radiationM", models.radiation);
 
     engine.rootContext()->setContextProperty("locationM", locationModel);
     engine.rootContext()->setContextProperty( "stateM", stateModel );

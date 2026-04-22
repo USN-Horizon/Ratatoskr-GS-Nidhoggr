@@ -13,6 +13,7 @@ struct FlightModels {
     TimeSeriesModel* pressure;
     TimeSeriesModel* altitude;
     TimeSeriesModel* velocity;
+    TimeSeriesModel* radiation;
     LocationModel* location;
     FlightStateModel* state;
 };
