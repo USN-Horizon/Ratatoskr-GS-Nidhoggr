@@ -63,65 +63,17 @@ TimeSeriesModel* FlightLogFactory::createBatteryModel(const QString& flightLogPa
     return model;
 }
 
-TimeSeriesModel* FlightLogFactory::createLatitudeModel(const QString& flightLogPath)
+FlightStateModel* FlightLogFactory::createStateModel()
 {
-    // Use custom processing to convert deg/10000 to degrees
-    QVector<qreal> xValues;
-    QVector<qreal> yValues;
-
-    TimeSeriesFactory::processCsv(
-        flightLogPath,
-        [](const QStringList& fields, int lineNumber, QVector<qreal>& xValues, QVector<qreal>& yValues) {
-            if (fields.size() >= 5) {
-                bool okTime, okLat;
-                qreal timeValue = fields[0].toDouble(&okTime);  // seconds column
-                qreal latValue = fields[3].toDouble(&okLat);  // lat[deg/10000] column
-
-                if (okTime && okLat) {
-                    // Convert seconds to milliseconds and deg/10000 to degrees
-                    xValues.append(timeValue * 1000.0);
-                    yValues.append(latValue / 10000.0); // Convert to degrees
-                }
-            }
-        },
-        xValues,
-        yValues
-        );
-
-    TimeSeriesModel* model = new TimeSeriesModel();
-    model->setData(xValues, yValues);
-    model->setColumnLabels("Time (ms)", "Latitude (deg)");
+    // Create a new model
+    FlightStateModel* model = new FlightStateModel();
     return model;
 }
 
-TimeSeriesModel* FlightLogFactory::createLongitudeModel(const QString& flightLogPath)
+LocationModel* FlightLogFactory::createLocationModel()
 {
-    // Use custom processing to convert deg/10000 to degrees
-    QVector<qreal> xValues;
-    QVector<qreal> yValues;
-
-    TimeSeriesFactory::processCsv(
-        flightLogPath,
-        [](const QStringList& fields, int lineNumber, QVector<qreal>& xValues, QVector<qreal>& yValues) {
-            if (fields.size() >= 6) {
-                bool okTime, okLon;
-                qreal timeValue = fields[0].toDouble(&okTime);  // seconds column
-                qreal lonValue = fields[4].toDouble(&okLon);  // lon[deg/10000] column
-
-                if (okTime && okLon) {
-                    // Convert seconds to milliseconds and deg/10000 to degrees
-                    xValues.append(timeValue * 1000.0);
-                    yValues.append(lonValue / 10000.0); // Convert to degrees
-                }
-            }
-        },
-        xValues,
-        yValues
-        );
-
-    TimeSeriesModel* model = new TimeSeriesModel();
-    model->setData(xValues, yValues);
-    model->setColumnLabels("Time (ms)", "Longitude (deg)");
+    // Create a new model
+    LocationModel* model = new LocationModel();
     return model;
 }
 
@@ -130,7 +82,7 @@ TimeSeriesModel* FlightLogFactory::createLongitudeModel(const QString& flightLog
  * @param flightLogPath Path to the flight log CSV
  * @return A new FlightStateModel populated with state data
  */
-FlightStateModel* FlightLogFactory::createStateModel(const QString& flightLogPath)
+FlightStateModel* FlightLogFactory::createStateModelFromCsv(const QString& flightLogPath)
 {
     // Create a new model
     FlightStateModel* model = new FlightStateModel();
@@ -229,7 +181,7 @@ FlightStateModel* FlightLogFactory::createStateModel(const QString& flightLogPat
     return model;
 }
 
-TimeSeriesModel* FlightLogFactory::createModel(const QString& flightLogPath, const QString& columnName)
+TimeSeriesModel* FlightLogFactory::createModelFromCsv(const QString& flightLogPath, const QString& columnName)
 {
     // Handle special cases
     if (columnName == "altitude[m]") {
@@ -238,10 +190,6 @@ TimeSeriesModel* FlightLogFactory::createModel(const QString& flightLogPath, con
         return createVelocityModel(flightLogPath);
     } else if (columnName == "battery[decivolts]") {
         return createBatteryModel(flightLogPath);
-    } else if (columnName == "lat[deg/10000]") {
-        return createLatitudeModel(flightLogPath);
-    } else if (columnName == "lon[deg/10000]") {
-        return createLongitudeModel(flightLogPath);
     }
 
     // Default case: just use the column as-is
@@ -251,4 +199,126 @@ TimeSeriesModel* FlightLogFactory::createModel(const QString& flightLogPath, con
         columnName,
         1000.0  // Convert seconds to milliseconds
         );
+}
+
+TimeSeriesModel* FlightLogFactory::createModel(const QString& columnName)
+{
+    auto *model = new TimeSeriesModel();
+    model->setColumnLabels("Time (ms)", columnName);
+    return model;
+}
+
+ParsedFlightLog FlightLogFactory::parse(const QString& flightLogPath)
+{
+    ParsedFlightLog result;
+
+    QFile file(flightLogPath);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qDebug() << "FlightLogFactory::parse: could not open file:" << file.errorString();
+        return result;
+    }
+
+    QTextStream in(&file);
+    if (in.atEnd()) { file.close(); return result; }
+
+    // Find column indices from header
+    const QStringList headers = in.readLine().split(',');
+    int colTime = -1, colState = 1, colAlt = -1, colVel = -1;
+    int colBattery = -1, colLat = -1, colLon = -1;
+
+    for (int i = 0; i < headers.size(); ++i) {
+        const QString h = headers[i].trimmed();
+        if      (h == "ts[deciseconds]")    colTime    = i;
+        else if (h == "state")              colState   = i;
+        else if (h == "altitude[m]")        colAlt     = i;
+        else if (h == "velocity[m/s]")      colVel     = i;
+        else if (h == "battery[decivolts]") colBattery = i;
+        else if (h == "lat[deg/10000]")     colLat     = i;
+        else if (h == "lon[deg/10000]")     colLon     = i;
+    }
+
+    if (colTime == -1) {
+        qDebug() << "FlightLogFactory::parse: 'seconds' column not found. Header:" << headers;
+        file.close();
+        return result;
+    }
+
+    bool firstLine = true;
+    qreal timeOffsetMs = 0;
+
+
+    while (!in.atEnd()) {
+        const QString line = in.readLine();
+        if (line.isEmpty()) continue;
+
+        const QStringList fields = line.split(',');
+        if (fields.size() <= colTime) continue;
+
+        bool okTime;
+        // the source is in deciseconds, as set by cats, so we need to go desiseconds -> milliseconds == 10^2
+        const qreal timeMs = fields[colTime].toDouble(&okTime) * 100.0 - timeOffsetMs;
+
+        // depending on when the flight computer was started, the first row could have a very large ts number.
+        // therefore we need to use the first row as the baseline
+        if (firstLine) {
+            timeOffsetMs = timeMs;
+            firstLine = false;
+        }
+
+        if (!okTime) continue;
+
+        auto readReal = [&](int col, double scale = 1.0) -> qreal {
+            if (col == -1 || fields.size() <= col) return 0.0;
+            bool ok;
+            const qreal v = fields[col].toDouble(&ok);
+            return ok ? v * scale : 0.0;
+        };
+        auto readInt = [&](int col) -> int {
+            if (col == -1 || fields.size() <= col) return 0;
+            bool ok;
+            const int v = fields[col].toInt(&ok);
+            return ok ? v : 0;
+        };
+
+        result.timeMs.append(timeMs);
+        result.state.append(readInt(colState));
+        if (colAlt     != -1) result.altitude.append(readReal(colAlt));
+        if (colVel     != -1) result.velocity.append(readReal(colVel));
+        if (colBattery != -1) result.battery.append(readReal(colBattery, 0.1));
+        if (colLat     != -1) result.latitude.append(readReal(colLat, 1.0 / 10000.0));
+        if (colLon     != -1) result.longitude.append(readReal(colLon, 1.0 / 10000.0));
+    }
+
+    file.close();
+    result.valid = true;
+    qDebug() << "FlightLogFactory::parse: loaded" << result.timeMs.size() << "rows";
+    return result;
+}
+
+void FlightLogFactory::populateAltitude(TimeSeriesModel* model, const ParsedFlightLog& data)
+{
+    model->setData(data.timeMs, data.altitude);
+    model->setColumnLabels("Time (ms)", "Altitude (m)");
+}
+
+void FlightLogFactory::populateVelocity(TimeSeriesModel* model, const ParsedFlightLog& data)
+{
+    model->setData(data.timeMs, data.velocity);
+    model->setColumnLabels("Time (ms)", "Velocity (m/s)");
+}
+
+void FlightLogFactory::populateBattery(TimeSeriesModel* model, const ParsedFlightLog& data)
+{
+    model->setData(data.timeMs, data.battery);
+    model->setColumnLabels("Time (ms)", "Battery (V)");
+}
+
+void FlightLogFactory::populateLocation(LocationModel* model, const ParsedFlightLog& data)
+{
+    model->setData(data.timeMs, data.latitude, data.longitude);
+}
+
+void FlightLogFactory::populateState(FlightStateModel* model, const ParsedFlightLog& data)
+{
+    model->setStateData(data.timeMs, data.state);
 }

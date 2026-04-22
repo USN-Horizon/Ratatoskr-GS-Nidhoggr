@@ -1,5 +1,5 @@
-#ifndef TIMESERIESMODEL_H
-#define TIMESERIESMODEL_H
+#ifndef LOCATIONMODEL_H
+#define LOCATIONMODEL_H
 
 #include <QAbstractListModel>
 #include <QHash>
@@ -9,23 +9,25 @@
  * @brief The TimeSeriesModel class represents generic time-series data
  * where X is time in milliseconds and Y is any double value.
  */
-class TimeSeriesModel : public QAbstractListModel
+class LocationModel : public QAbstractListModel
 {
     Q_OBJECT
 
 public:
     enum Columns {
         X_COLUMN = 0,
-        Y_COLUMN = 1,
-        COLUMN_COUNT = 2
+        Y_LAT_COLUMN = 1,
+        Y_LON_COLUMN = 2,
+        COLUMN_COUNT = 3
     };
 
     enum Roles {
         XRole = Qt::UserRole + 1,
-        YRole
+        YLatRole,
+        YLonRole
     };
 
-    explicit TimeSeriesModel(QObject *parent = nullptr);
+    explicit LocationModel(QObject *parent = nullptr);
 
     // QAbstractListModel interface
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
@@ -36,7 +38,7 @@ public:
     /**
      * @brief Append a single data point
      */
-    Q_INVOKABLE void appendData(qreal x, qreal y);
+    Q_INVOKABLE void appendData(qreal x, qreal y_lat, qreal y_lon);
 
     /**
      * @brief Remove data at specified row
@@ -50,14 +52,9 @@ public:
     Q_INVOKABLE QVariantMap get(int row) const;
 
     /**
-     * @brief Set column labels (cosmetic metadata for consumers)
-     */
-    void setColumnLabels(const QString &xLabel, const QString &yLabel);
-
-    /**
      * @brief Bulk-replace all data using proper insert/remove signals
      */
-    void setData(const QVector<qreal> &xValues, const QVector<qreal> &yValues);
+    void setData(const QVector<qreal> &xValues, const QVector<qreal> &yLatValues, const QVector<qreal> &yLonValues);
 
     /**
      * @brief Clear all data
@@ -66,9 +63,11 @@ public:
 
 private:
     QVector<qreal> m_xData;
-    QVector<qreal> m_yData;
+    QVector<qreal> m_yLatData;
+    QVector<qreal> m_yLonData;
     QString m_xLabel;
-    QString m_yLabel;
+    QString m_yLatLabel;
+    QString m_yLonLabel;
 };
 
-#endif // TIMESERIESMODEL_H
+#endif // LOCATIONMODEL_H

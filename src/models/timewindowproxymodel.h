@@ -4,6 +4,7 @@
 #include <QAbstractProxyModel>
 #include <QSortFilterProxyModel>
 #include <QTimer>
+#include <QVariantMap>
 #include "timer.h"
 
 /**
@@ -36,6 +37,9 @@ public:
 
     // Current time value
     double currentTime() const;
+
+    // Get data for a proxy row, delegating to the source model's get()
+    Q_INVOKABLE QVariantMap get(int row) const;
 
     // Map source coordinates to proxy coordinates
     QModelIndex mapFromSource(const QModelIndex &sourceIndex) const override;

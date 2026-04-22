@@ -72,6 +72,21 @@ double TimeWindowProxyModel::currentTime() const
     return m_timer ? m_timer->seconds() : 0.0;
 }
 
+QVariantMap TimeWindowProxyModel::get(int row) const
+{
+    if (!sourceModel() || row < 0 || row >= rowCount())
+        return QVariantMap();
+
+    QModelIndex srcIndex = mapToSource(index(row, 0));
+    QVariantMap result;
+    QMetaObject::invokeMethod(
+        const_cast<QAbstractItemModel*>(sourceModel()), "get",
+        Q_RETURN_ARG(QVariantMap, result),
+        Q_ARG(int, srcIndex.row())
+    );
+    return result;
+}
+
 QModelIndex TimeWindowProxyModel::mapFromSource(const QModelIndex &sourceIndex) const
 {
     if (!sourceIndex.isValid())
@@ -118,8 +133,8 @@ QVariant TimeWindowProxyModel::data(const QModelIndex &index, int role) const
             // Calculate time relative to current time
             double currentTime = m_timer ? m_timer->seconds() * 1000.0 : 0.0;
 
-            // Return time as "milliseconds ago"
-            return currentTime - timeValue;
+            // Return negative offset: 0 = newest, -windowSize*1000 = oldest
+            return timeValue - currentTime;
         }
     }
 

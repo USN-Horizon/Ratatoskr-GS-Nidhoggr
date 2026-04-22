@@ -11,6 +11,7 @@ INCLUDEPATH = src
 SOURCES += \
         src/main.cpp \
         src/humiditycollection.cpp \
+        src/missionmanager.cpp \
         src/models/flightstatemodel.cpp \
         src/utils/flightstateutils.cpp \
         src/models/timeseriesmodel.cpp \
@@ -20,10 +21,12 @@ SOURCES += \
         src/utils/flightlogfactory.cpp \
         src/utils/humidityutils.cpp \
         src/models/humiditymodel.cpp \
-        src/utils/timeseriesfactory.cpp
+        src/utils/timeseriesfactory.cpp \
+        src/models/locationmodel.cpp
 
 HEADERS +=  \
     src/humiditycollection.h \
+    src/missionmanager.h \
     src/models/flightstatemodel.h \
     src/utils/flightstateutils.h \
     src/models/timeseriesmodel.h \
@@ -33,10 +36,12 @@ HEADERS +=  \
     src/utils/flightlogfactory.h \
     src/utils/humidityutils.h \
     src/models/humiditymodel.h \
-    src/utils/timeseriesfactory.h
+    src/utils/timeseriesfactory.h \
+    src/models/locationmodel.h
 
 		
-RESOURCES += qml/qml.qrc
+RESOURCES += qml/qml.qrc \
+    resources/resources.qrc
 
 # Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH = qml

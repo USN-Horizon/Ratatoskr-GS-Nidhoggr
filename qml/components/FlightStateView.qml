@@ -5,6 +5,7 @@ import com.horizon.components
 
 Item {
     id: root
+    implicitHeight: 170
 
     // Properties
     property alias stateModel: stateWindow.sourceModel
