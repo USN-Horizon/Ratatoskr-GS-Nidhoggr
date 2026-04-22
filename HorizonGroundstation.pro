@@ -1,4 +1,4 @@
-QT += quick widgets graphs qml core gui
+QT += core gui widgets quick qml graphs serialport
 CONFIG += c++17
 CONFIG += console
 
@@ -12,6 +12,7 @@ SOURCES += \
         src/main.cpp \
         src/humiditycollection.cpp \
         src/models/flightstatemodel.cpp \
+        src/serialreader.cpp \
         src/utils/flightstateutils.cpp \
         src/models/timeseriesmodel.cpp \
         src/models/timewindowproxymodel.cpp \
@@ -25,6 +26,7 @@ SOURCES += \
 HEADERS +=  \
     src/humiditycollection.h \
     src/models/flightstatemodel.h \
+    src/serialreader.h \
     src/utils/flightstateutils.h \
     src/models/timeseriesmodel.h \
     src/models/timewindowproxymodel.h \
@@ -43,4 +45,7 @@ QML_IMPORT_PATH = qml
 
 # Additional import path used to resolve QML modules just for Qt Quick Designer
 QML_DESIGNER_IMPORT_PATH =
+
+# Important: Serialport library linked
+win32: LIBS += -L$$[QT_INSTALL_LIBS] -lQt6SerialPort
 
