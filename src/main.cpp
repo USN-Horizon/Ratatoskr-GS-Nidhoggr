@@ -7,6 +7,7 @@
 #include "humiditycollection.h"
 #include "missionmanager.h"
 #include "timer.h"
+#include "serialreader.h"
 
 int main(int argc, char *argv[])
 {
@@ -33,6 +34,31 @@ int main(int argc, char *argv[])
     };
 
     MissionManager* missionManager = new MissionManager(models);
+
+    //Serial reader
+    SerialReader* serialReader = new SerialReader(&app);
+
+    // Debug: print every raw packet received
+    QObject::connect(serialReader, &SerialReader::rawPacketReceived,
+                     [](const QByteArray &packet) {
+                         qDebug() << "Packet received:" << packet.trimmed();
+                     });
+
+    // Debug: print any serial errors
+    QObject::connect(serialReader, &SerialReader::errorOccurred,
+                     [](const QString &error) {
+                         qDebug() << "Serial error:" << error;
+                     });
+
+    // Expose SerialReader to QML so you can call openPort()
+    engine.rootContext()->setContextProperty("serialReader", serialReader);
+
+    const QString Port = "COM5";
+    if (serialReader->openPort(Port, 115200)) {
+        qDebug() << "Listening for connection on" << Port;
+    } else {
+        qDebug() << "Could not open" << Port << "- check the port name";
+    }
 
     qmlRegisterType<CountupTimer>("com.horizon.components", 1, 0, "CountupTimer");
     qmlRegisterType<TimeSeriesModel>("com.horizon.components", 1, 0, "AltitudeModel");
