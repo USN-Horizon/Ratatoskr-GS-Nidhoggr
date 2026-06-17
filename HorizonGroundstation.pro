@@ -14,6 +14,7 @@ SOURCES += \
         src/humiditycollection.cpp \
         src/missionmanager.cpp \
         src/models/flightstatemodel.cpp \
+        src/packetparser.cpp \
         src/serialreader.cpp \
         src/utils/flightstateutils.cpp \
         src/models/timeseriesmodel.cpp \
@@ -30,6 +31,7 @@ HEADERS +=  \
     src/humiditycollection.h \
     src/missionmanager.h \
     src/models/flightstatemodel.h \
+    src/packetparser.h \
     src/serialreader.h \
     src/utils/flightstateutils.h \
     src/models/timeseriesmodel.h \

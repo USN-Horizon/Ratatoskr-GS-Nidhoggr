@@ -92,6 +92,7 @@ ApplicationWindow {
 
         TopBar {
             id: topBar
+            objectName: "topBar"
             Layout.fillWidth: true
         }
 

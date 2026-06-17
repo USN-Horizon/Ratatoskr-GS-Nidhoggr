@@ -4,10 +4,14 @@
 #include <models/timewindowproxymodel.h>
 #include <models/flightstatemodel.h>
 #include <utils/flightlogfactory.h>
+#include <QDateTime>
+#include <cmath>
+#include <QElapsedTimer>
 #include "humiditycollection.h"
 #include "missionmanager.h"
 #include "timer.h"
 #include "serialreader.h"
+#include "packetparser.h"
 #include "mavlink/HorizonDialect/HorizonDialect.hpp"
 
 using namespace mavlink;
@@ -63,29 +67,61 @@ int main(int argc, char *argv[])
 
     MissionManager* missionManager = new MissionManager(models);
 
-    //Serial reader
+    //Serial reader & Parse packer
     SerialReader* serialReader = new SerialReader(&app);
+    PacketParser* parser = new PacketParser(&app);
 
-    // Debug: print every raw packet received
+    QElapsedTimer* elapsedTimer = new QElapsedTimer();
+    elapsedTimer->start();
+
+    bool* timerReset = new bool(false);
+
     QObject::connect(serialReader, &SerialReader::rawPacketReceived,
-                     [](const QByteArray &packet) {
-                         qDebug() << "Packet received:" << packet.trimmed();
+                     parser, &PacketParser::parse);
+
+    QObject::connect(parser, &PacketParser::altitudeReceived,
+                     [models, elapsedTimer, timerReset](double value) {
+                         if (!*timerReset) {
+                             elapsedTimer->restart();
+                             *timerReset = true;
+                         }
+                         models.altitude->appendData(elapsedTimer->elapsed(), value);
+                     });
+    QObject::connect(parser, &PacketParser::velocityReceived,
+                     [models, elapsedTimer](double value) {
+                         models.velocity->appendData(elapsedTimer->elapsed(), value);
+                     });
+    QObject::connect(parser, &PacketParser::pressureReceived,
+                     [models, elapsedTimer](double value) {
+                         models.pressure->appendData(elapsedTimer->elapsed(), value);
+                     });
+    QObject::connect(parser, &PacketParser::accelerationReceived,
+                     [models, elapsedTimer](double x, double y, double z) {
+                         qreal magnitude = std::sqrt(x*x + y*y + z*z);
+                         models.acceleration->appendData(elapsedTimer->elapsed(), magnitude);
+                     });
+    QObject::connect(parser, &PacketParser::rotationReceived,
+                     [models, elapsedTimer](double x, double y, double z) {
+                         qreal magnitude = std::sqrt(x*x + y*y + z*z);
+                         models.rotation->appendData(elapsedTimer->elapsed(), magnitude);
+                     });
+    QObject::connect(parser, &PacketParser::radiationReceived,
+                     [models, elapsedTimer](double value) {
+                         models.radiation->appendData(elapsedTimer->elapsed(), value);
                      });
 
-    // Debug: print any serial errors
     QObject::connect(serialReader, &SerialReader::errorOccurred,
                      [](const QString &error) {
                          qDebug() << "Serial error:" << error;
                      });
 
-    // Expose SerialReader to QML so you can call openPort()
     engine.rootContext()->setContextProperty("serialReader", serialReader);
 
     const QString Port = "COM5";
     if (serialReader->openPort(Port, 115200)) {
-        qDebug() << "Listening for connection on" << Port;
+        qDebug() << "Listening on" << Port;
     } else {
-        qDebug() << "Could not open" << Port << "- check the port name";
+        qDebug() << "Could not open" << Port;
     }
 
     qmlRegisterType<CountupTimer>("com.horizon.components", 1, 0, "CountupTimer");
@@ -127,6 +163,21 @@ int main(int argc, char *argv[])
                              QCoreApplication::exit(-1);
                      }, Qt::QueuedConnection);
     engine.load(url);
+
+    QObject* timerStarter = new QObject(&app);
+    QObject::connect(parser, &PacketParser::altitudeReceived,
+                     timerStarter, [&engine, timerStarter]() {
+                         QObject* root = engine.rootObjects().isEmpty() ? nullptr : engine.rootObjects().first();
+                         if (!root) return;
+                         QObject* topBarObj = root->findChild<QObject*>("topBar");
+                         if (!topBarObj) return;
+                         QObject* timer = topBarObj->property("missionTimer").value<QObject*>();
+                         if (!timer) return;
+                         QMetaObject::invokeMethod(timer, "resume");
+
+                         // Only disconnect this specific connection by deleting the context object
+                         timerStarter->deleteLater();
+                     });
 
     return app.exec();
 }
