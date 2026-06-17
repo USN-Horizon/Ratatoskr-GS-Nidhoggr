@@ -7,7 +7,7 @@ QString MissionManager::missionName() const {return m_missionName;}
 
 QString MissionManager::modeText() const
 {
-    if (std::get_if<PlaybackState>(&m_state)) return "Capture Mode";
+    if (!isPlayback()) return "Capture Mode";
     return "Playback Mode";
 }
 
