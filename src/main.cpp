@@ -12,6 +12,34 @@
 #include "timer.h"
 #include "serialreader.h"
 #include "packetparser.h"
+#include "mavlink/HorizonDialect/HorizonDialect.hpp"
+
+using namespace mavlink;
+
+void decode_message(const mavlink_message_t* msg) {
+    mavlink::MsgMap map(msg);
+
+    if (msg->msgid == mavlink::HorizonDialect::msg::COSMIC_RADIATION::MSG_ID) {
+        mavlink::HorizonDialect::msg::COSMIC_RADIATION rad;
+        rad.deserialize(map);
+
+        qDebug() << "Radiation " << rad.radiation;
+    }
+}
+
+void process_byte_buffer(const uint8_t* buffer, size_t length) {
+    mavlink_message_t msg;
+    mavlink_status_t status;
+
+    for(size_t i = 0; i < length; i++) {
+        uint8_t byte = buffer[i];
+
+        if (mavlink_frame_char(MAVLINK_COMM_0, byte, &msg, &status) == MAVLINK_FRAMING_OK) {
+            qDebug() << "Got message ID " << msg.msgid << " length " << msg.len;
+            decode_message(&msg);
+        }
+    }
+}
 
 int main(int argc, char *argv[])
 {
