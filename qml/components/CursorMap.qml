@@ -69,6 +69,9 @@ Item {
     Plugin {
         id: mapPlugin
         name: "osm"
+        PluginParameter { name: "osm.mapping.providersrepository.disabled"; value: "true" }
+        PluginParameter { name: "osm.mapping.custom.host"; value: "https://tile.openstreetmap.org/%z/%x/%y.png" }
+        PluginParameter { name: "osm.mapping.custom.mapcopyright"; value: "© OpenStreetMap contributors" }
     }
 
     Map {
@@ -77,6 +80,15 @@ Item {
         center: QtPositioning.coordinate(59.6645, 9.6440) // Krona
         zoomLevel: 16
         property geoCoordinate startCentroid
+
+        Component.onCompleted: {
+            for (var i = 0; i < supportedMapTypes.length; i++) {
+                if (supportedMapTypes[i].style === MapType.CustomMap) {
+                    activeMapType = supportedMapTypes[i]
+                    break
+                }
+            }
+        }
 
         anchors {
             top: parent.top

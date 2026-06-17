@@ -9,6 +9,7 @@ CONFIG += console
 INCLUDEPATH = src
 
 SOURCES += \
+        src/mavlink_msg_entry.cpp \
         src/main.cpp \
         src/humiditycollection.cpp \
         src/missionmanager.cpp \
