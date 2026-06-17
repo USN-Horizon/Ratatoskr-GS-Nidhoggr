@@ -12,34 +12,6 @@
 #include "timer.h"
 #include "serialreader.h"
 #include "packetparser.h"
-#include "mavlink/HorizonDialect/HorizonDialect.hpp"
-
-using namespace mavlink;
-
-void decode_message(const mavlink_message_t* msg) {
-    mavlink::MsgMap map(msg);
-
-    if (msg->msgid == mavlink::HorizonDialect::msg::COSMIC_RADIATION::MSG_ID) {
-        mavlink::HorizonDialect::msg::COSMIC_RADIATION rad;
-        rad.deserialize(map);
-
-        qDebug() << "Radiation " << rad.radiation;
-    }
-}
-
-void process_byte_buffer(const uint8_t* buffer, size_t length) {
-    mavlink_message_t msg;
-    mavlink_status_t status;
-
-    for(size_t i = 0; i < length; i++) {
-        uint8_t byte = buffer[i];
-
-        if (mavlink_frame_char(MAVLINK_COMM_0, byte, &msg, &status) == MAVLINK_FRAMING_OK) {
-            qDebug() << "Got message ID " << msg.msgid << " length " << msg.len;
-            decode_message(&msg);
-        }
-    }
-}
 
 int main(int argc, char *argv[])
 {
@@ -117,11 +89,13 @@ int main(int argc, char *argv[])
 
     engine.rootContext()->setContextProperty("serialReader", serialReader);
 
-    const QString Port = "COM5";
-    if (serialReader->openPort(Port, 115200)) {
-        qDebug() << "Listening on" << Port;
+    const QString port = SerialReader::findHorizonPort();
+    if (port.isEmpty()) {
+        qDebug() << "Horizon module not found, no Arduino Nano 33 IoT based chip detected";
+    } else if (serialReader->openPort(port, 115200)) {
+        qDebug() << "Listening on" << port;
     } else {
-        qDebug() << "Could not open" << Port;
+        qDebug() << "Could not open" << port;
     }
 
     qmlRegisterType<CountupTimer>("com.horizon.components", 1, 0, "CountupTimer");
