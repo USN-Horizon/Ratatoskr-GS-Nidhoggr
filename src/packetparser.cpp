@@ -1,6 +1,7 @@
 #include "packetparser.h"
 #include <cmath>
 #include <cstring>
+#include <QDebug>
 
 PacketParser::PacketParser(QObject *parent) : QObject(parent)
 {
@@ -10,20 +11,44 @@ PacketParser::PacketParser(QObject *parent) : QObject(parent)
 
 void PacketParser::parse(const QByteArray &data)
 {
-    for (uint8_t byte : data) {
-        if (mavlink_parse_char(MAVLINK_COMM_0, byte, &m_msg, &m_status) == MAVLINK_FRAMING_OK)
+    qDebug() << "parse() bytes:" << data.size() << "hex:" << data.left(16).toHex(' ');
+    for (int i = 0; i < data.size(); ++i) {
+        const uint8_t byte = static_cast<uint8_t>(data.at(i));
+        const uint8_t res = mavlink_frame_char(MAVLINK_COMM_0, byte, &m_msg, &m_status);
+        switch (res) {
+        case MAVLINK_FRAMING_OK:
             handleMessage(m_msg);
+            break;
+        case MAVLINK_FRAMING_BAD_CRC:
+            qDebug() << "MAVLink bad CRC (total errors:" << m_status.parse_error << ")";
+            break;
+        case MAVLINK_FRAMING_BAD_SIGNATURE:
+            qDebug() << "MAVLink bad signature";
+            break;
+        default:
+            break; // MAVLINK_FRAMING_INCOMPLETE: normal mid-packet, no log
+        }
     }
 }
 
 void PacketParser::handleMessage(const mavlink_message_t &msg)
 {
+    qDebug() << "got message";
     switch (msg.msgid) {
     case MAVLINK_MSG_ID_SCALED_IMU: {
         mavlink_scaled_imu_t imu;
         mavlink_msg_scaled_imu_decode(&msg, &imu);
         emit accelerationReceived(imu.xacc / 1000.0, imu.yacc / 1000.0, imu.zacc / 1000.0);
+        break;
+    }
+    case MAVLINK_MSG_ID_SCALED_IMU2: {
+        mavlink_scaled_imu_t imu;
+        mavlink_msg_scaled_imu_decode(&msg, &imu);
         emit rotationReceived(imu.xgyro / 1000.0, imu.ygyro / 1000.0, imu.zgyro / 1000.0);
+        break;
+    }
+    case MAVLINK_MSG_ID_SCALED_IMU3: {
+        // TODO: mag
         break;
     }
     case MAVLINK_MSG_ID_SCALED_PRESSURE: {
@@ -46,6 +71,23 @@ void PacketParser::handleMessage(const mavlink_message_t &msg)
         mavlink_msg_cosmic_radiation_decode(&msg, &rad);
         emit radiationReceived(rad.radiation);
         break;
+    }
+    case MAVLINK_MSG_ID_NAMED_VALUE_INT: {
+        mavlink_named_value_int_t temp;
+        mavlink_msg_named_value_int_decode(&msg, &temp);
+        QLatin1StringView name(temp.name, strnlen(temp.name, sizeof(temp.name)));
+
+        if (name == "BARO_T") {
+            emit temperatureReceived(temp.value);
+        } else if (name == "LORA_T") {
+            // transceiver temperature
+        } else if (name == "LORA_V") {
+            // transceiver voltage
+        }
+        break;
+    }
+    case MAVLINK_MSG_ID_HEARTBEAT: {
+        // TODO
     }
     default:
         break;
