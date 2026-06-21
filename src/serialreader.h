@@ -19,6 +19,7 @@ public:
     bool isOpen() const;
 
     static QStringList availablePorts();
+    static QString findHorizonPort();
 
 signals:
     void rawPacketReceived(const QByteArray &packet);
@@ -30,9 +31,6 @@ private slots:
 
 private:
     QSerialPort *serialPort;
-    QByteArray byteBuffer;
-
-    void processBuffer();
 };
 
 #endif // SERIALREADER_H

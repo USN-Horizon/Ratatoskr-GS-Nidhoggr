@@ -1,42 +1,95 @@
 #include "packetparser.h"
-#include <QDebug>
 #include <cmath>
+#include <cstring>
+#include <QDebug>
 
-PacketParser::PacketParser(QObject *parent) : QObject(parent) {}
-
-void PacketParser::parse(const QByteArray &packet)
+PacketParser::PacketParser(QObject *parent) : QObject(parent)
 {
-    QString line = QString::fromUtf8(packet).trimmed();
+    memset(&m_msg, 0, sizeof(m_msg));
+    memset(&m_status, 0, sizeof(m_status));
+}
 
-    if (line.isEmpty() || line.startsWith("runId"))
-        return;
-
-    QStringList f = line.split(',');
-    if (f.size() < 19) {
-        qDebug() << "Bad packet (" << f.size() << "fields):" << line;
-        return;
+void PacketParser::parse(const QByteArray &data)
+{
+    qDebug() << "parse() bytes:" << data.size() << "hex:" << data.left(16).toHex(' ');
+    for (int i = 0; i < data.size(); ++i) {
+        const uint8_t byte = static_cast<uint8_t>(data.at(i));
+        const uint8_t res = mavlink_frame_char(MAVLINK_COMM_0, byte, &m_msg, &m_status);
+        switch (res) {
+        case MAVLINK_FRAMING_OK:
+            handleMessage(m_msg);
+            break;
+        case MAVLINK_FRAMING_BAD_CRC:
+            qDebug() << "MAVLink bad CRC (total errors:" << m_status.parse_error << ")";
+            break;
+        case MAVLINK_FRAMING_BAD_SIGNATURE:
+            qDebug() << "MAVLink bad signature";
+            break;
+        default:
+            break; // MAVLINK_FRAMING_INCOMPLETE: normal mid-packet, no log
+        }
     }
+}
 
-    // Convert units
-    double ax = f[2].toDouble() / 1000.0;   // mg -> g
-    double ay = f[3].toDouble() / 1000.0;
-    double az = f[4].toDouble() / 1000.0;
+void PacketParser::handleMessage(const mavlink_message_t &msg)
+{
+    qDebug() << "got message";
+    switch (msg.msgid) {
+    case MAVLINK_MSG_ID_SCALED_IMU: {
+        mavlink_scaled_imu_t imu;
+        mavlink_msg_scaled_imu_decode(&msg, &imu);
+        emit accelerationReceived(imu.xacc / 1000.0, imu.yacc / 1000.0, imu.zacc / 1000.0);
+        break;
+    }
+    case MAVLINK_MSG_ID_SCALED_IMU2: {
+        mavlink_scaled_imu_t imu;
+        mavlink_msg_scaled_imu_decode(&msg, &imu);
+        emit rotationReceived(imu.xgyro / 1000.0, imu.ygyro / 1000.0, imu.zgyro / 1000.0);
+        break;
+    }
+    case MAVLINK_MSG_ID_SCALED_IMU3: {
+        // TODO: mag
+        break;
+    }
+    case MAVLINK_MSG_ID_SCALED_PRESSURE: {
+        mavlink_scaled_pressure_t pres;
+        mavlink_msg_scaled_pressure_decode(&msg, &pres);
+        emit pressureReceived(pres.press_abs);
+        emit temperatureReceived(pres.temperature / 100.0);
+        double alt = 44330.0 * (1.0 - pow(pres.press_abs / 1013.25, 0.1903));
+        emit altitudeReceived(alt);
+        break;
+    }
+    case MAVLINK_MSG_ID_VFR_HUD: {
+        mavlink_vfr_hud_t hud;
+        mavlink_msg_vfr_hud_decode(&msg, &hud);
+        emit velocityReceived(hud.groundspeed);
+        break;
+    }
+    case MAVLINK_MSG_ID_COSMIC_RADIATION: {
+        mavlink_cosmic_radiation_t rad;
+        mavlink_msg_cosmic_radiation_decode(&msg, &rad);
+        emit radiationReceived(rad.radiation);
+        break;
+    }
+    case MAVLINK_MSG_ID_NAMED_VALUE_INT: {
+        mavlink_named_value_int_t temp;
+        mavlink_msg_named_value_int_decode(&msg, &temp);
+        QLatin1StringView name(temp.name, strnlen(temp.name, sizeof(temp.name)));
 
-    double gx = f[5].toDouble() / 1000.0;   // mrad/s -> rad/s
-    double gy = f[6].toDouble() / 1000.0;
-    double gz = f[7].toDouble() / 1000.0;
-
-    double pressure    = f[11].toDouble();
-    double temperature = f[12].toDouble() / 100.0;  // centi-C -> C
-    double geiger      = f[13].toDouble() + f[14].toDouble();
-
-    // Derive altitude from pressure (barometric formula)
-    double altitude = 44330.0 * (1.0 - pow(pressure / 1013.25, 0.1903));
-
-    emit accelerationReceived(ax, ay, az);
-    emit rotationReceived(gx, gy, gz);
-    emit pressureReceived(pressure);
-    emit altitudeReceived(altitude);
-    emit radiationReceived(geiger);
-    emit temperatureReceived(temperature);
+        if (name == "BARO_T") {
+            emit temperatureReceived(temp.value);
+        } else if (name == "LORA_T") {
+            // transceiver temperature
+        } else if (name == "LORA_V") {
+            // transceiver voltage
+        }
+        break;
+    }
+    case MAVLINK_MSG_ID_HEARTBEAT: {
+        // TODO
+    }
+    default:
+        break;
+    }
 }

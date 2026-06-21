@@ -25,9 +25,9 @@ bool SerialReader::openPort(const QString &portName, qint32 baudRate)
     serialPort->setStopBits(QSerialPort::OneStop);
     serialPort->setFlowControl(QSerialPort::NoFlowControl);
 
-    if (serialPort->open(QIODevice::ReadOnly)) {
+    if (serialPort->open(QIODevice::ReadWrite)) {
+        serialPort->setDataTerminalReady(false);
         qDebug() << "Serial port opened:" << portName << "at" << baudRate << "baud";
-        byteBuffer.clear();
         return true;
     } else {
         emit errorOccurred("Failed to open port: " + serialPort->errorString());
@@ -58,26 +58,30 @@ QStringList SerialReader::availablePorts()
     return ports;
 }
 
-void SerialReader::handleReadyRead()
-{
-    // Append new data to buffer
-    byteBuffer.append(serialPort->readAll());
-
-    // Process any complete packets in buffer
-    processBuffer();
+// Arduino Nano 33 IoT: VID 0x2341, PID 0x8057
+namespace {
+    constexpr quint16 ARDUINO_VID = 0x2341;
+    constexpr quint16 NANO_33_IOT_PID = 0x8057;
 }
 
-void SerialReader::processBuffer()
+QString SerialReader::findHorizonPort()
 {
-    while (true)
-    {
-        int newlineIndex = byteBuffer.indexOf('\n');
-        if (newlineIndex == -1) break;
-
-        QByteArray packet = byteBuffer.left(newlineIndex + 1);
-        byteBuffer.remove(0, newlineIndex + 1);
-        emit rawPacketReceived(packet);
+    const auto infos = QSerialPortInfo::availablePorts();
+    for (const QSerialPortInfo &info : infos) {
+        if (info.hasVendorIdentifier() && info.hasProductIdentifier()
+            && info.vendorIdentifier() == ARDUINO_VID
+            && info.productIdentifier() == NANO_33_IOT_PID) {
+            qDebug() << "Found Horizon module on" << info.portName()
+                     << "(" << info.description() << ")";
+            return info.portName();
+        }
     }
+    return {};
+}
+
+void SerialReader::handleReadyRead()
+{
+    emit rawPacketReceived(serialPort->readAll());
 }
 
 void SerialReader::handleError(QSerialPort::SerialPortError error)
@@ -85,5 +89,6 @@ void SerialReader::handleError(QSerialPort::SerialPortError error)
     if (error != QSerialPort::NoError && error != QSerialPort::TimeoutError) {
         emit errorOccurred(serialPort->errorString());
         qDebug() << "Serial error:" << serialPort->errorString();
+        qDebug() << "Serial error code:" << error << serialPort->errorString();
     }
 }

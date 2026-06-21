@@ -31,17 +31,14 @@ Item {
         }
     }
 
-    // Graph title with time indicator
-    Row {
+    Item {
         id: titleRow
         anchors {
             top: parent.top
             left: parent.left
             right: parent.right
             bottom: parent.bottom
-            //margins: 10
         }
-        spacing: 10
 
         // Main graph
         GraphsView {

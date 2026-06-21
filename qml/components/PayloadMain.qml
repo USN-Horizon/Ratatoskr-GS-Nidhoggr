@@ -100,8 +100,8 @@ RowLayout {
             yAxisMax: 500
             yAxisMin: -500
             yAxisInterval: 500
-            yAxisLabel: "Speed (m/s)"
-            unitText: "m/s"
+            yAxisLabel: "Counts per second (cps)"
+            unitText: "cps"
             lineColor: "#DBEB00"
             Layout.fillWidth: true
             Layout.fillHeight: true
