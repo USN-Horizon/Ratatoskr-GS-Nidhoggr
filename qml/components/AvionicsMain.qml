@@ -53,8 +53,8 @@ RowLayout {
             model: pressureM
             timer: topBar.missionTimer
             windowSize: 60      // Show last 120 seconds of data
-            yAxisMax: 100
-            yAxisInterval: 50
+            yAxisMax: 1200
+            yAxisInterval: 300
             yAxisLabel: "Pressure (kPa)"
             unitText: "kPa"
             lineColor: "#DBEB00"
