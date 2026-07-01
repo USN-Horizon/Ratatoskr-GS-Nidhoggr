@@ -12,6 +12,7 @@
 #include "timer.h"
 #include "serialreader.h"
 #include "packetparser.h"
+#include "horizoncomponents.h"
 
 int main(int argc, char *argv[])
 {
@@ -26,18 +27,33 @@ int main(int argc, char *argv[])
     FlightStateModel* stateModel = FlightLogFactory::createStateModel();
     LocationModel* locationModel = FlightLogFactory::createLocationModel();
 
-    FlightModels models = {
+    // Avionics and payload each have their own IMU/baro, so each gets its own
+    // set of time-series models. GPS and flight-phase state only exist on
+    // avionics, so those two are shared (not duplicated); radiation only
+    // exists on the payload.
+    FlightModels avionicsModels = {
+        FlightLogFactory::createModel("acceleration[m/s]"),
+        FlightLogFactory::createModel("rotation[deg/s]"),
+        FlightLogFactory::createModel("pressure[m/s]"),
+        FlightLogFactory::createModel("altitude[m]"),
+        FlightLogFactory::createModel("velocity[m/s]"),
+        nullptr, // radiation: no sensor on avionics
+        locationModel,
+        stateModel
+    };
+
+    FlightModels payloadModels = {
         FlightLogFactory::createModel("acceleration[m/s]"),
         FlightLogFactory::createModel("rotation[deg/s]"),
         FlightLogFactory::createModel("pressure[m/s]"),
         FlightLogFactory::createModel("altitude[m]"),
         FlightLogFactory::createModel("velocity[m/s]"),
         FlightLogFactory::createModel("cosmic_radiation[c/m]"),
-        locationModel,
-        stateModel
+        nullptr, // location: no GPS on the payload
+        nullptr  // state: flight-phase state machine lives on avionics
     };
 
-    MissionManager* missionManager = new MissionManager(models);
+    MissionManager* missionManager = new MissionManager(avionicsModels);
 
     //Serial reader & Parse packer
     SerialReader* serialReader = new SerialReader(&app);
@@ -51,35 +67,41 @@ int main(int argc, char *argv[])
     QObject::connect(serialReader, &SerialReader::rawPacketReceived,
                      parser, &PacketParser::parse);
 
+    // Picks which model set a sample belongs to based on the sending
+    // component's MAVLink component ID (see horizoncomponents.h).
+    auto modelsFor = [avionicsModels, payloadModels](uint8_t compid) {
+        return compid == HorizonComponent::Payload ? payloadModels : avionicsModels;
+    };
+
     QObject::connect(parser, &PacketParser::altitudeReceived,
-                     [models, elapsedTimer, timerReset](double value) {
+                     [modelsFor, elapsedTimer, timerReset](double value, uint8_t compid) {
                          if (!*timerReset) {
                              elapsedTimer->restart();
                              *timerReset = true;
                          }
-                         models.altitude->appendData(elapsedTimer->elapsed(), value);
+                         modelsFor(compid).altitude->appendData(elapsedTimer->elapsed(), value);
                      });
     QObject::connect(parser, &PacketParser::velocityReceived,
-                     [models, elapsedTimer](double value) {
-                         models.velocity->appendData(elapsedTimer->elapsed(), value);
+                     [modelsFor, elapsedTimer](double value, uint8_t compid) {
+                         modelsFor(compid).velocity->appendData(elapsedTimer->elapsed(), value);
                      });
     QObject::connect(parser, &PacketParser::pressureReceived,
-                     [models, elapsedTimer](double value) {
-                         models.pressure->appendData(elapsedTimer->elapsed(), value);
+                     [modelsFor, elapsedTimer](double value, uint8_t compid) {
+                         modelsFor(compid).pressure->appendData(elapsedTimer->elapsed(), value);
                      });
     QObject::connect(parser, &PacketParser::accelerationReceived,
-                     [models, elapsedTimer](double x, double y, double z) {
+                     [modelsFor, elapsedTimer](double x, double y, double z, uint8_t compid) {
                          qreal magnitude = std::sqrt(x*x + y*y + z*z);
-                         models.acceleration->appendData(elapsedTimer->elapsed(), magnitude);
+                         modelsFor(compid).acceleration->appendData(elapsedTimer->elapsed(), magnitude);
                      });
     QObject::connect(parser, &PacketParser::rotationReceived,
-                     [models, elapsedTimer](double x, double y, double z) {
+                     [modelsFor, elapsedTimer](double x, double y, double z, uint8_t compid) {
                          qreal magnitude = std::sqrt(x*x + y*y + z*z);
-                         models.rotation->appendData(elapsedTimer->elapsed(), magnitude);
+                         modelsFor(compid).rotation->appendData(elapsedTimer->elapsed(), magnitude);
                      });
     QObject::connect(parser, &PacketParser::radiationReceived,
-                     [models, elapsedTimer](double value) {
-                         models.radiation->appendData(elapsedTimer->elapsed(), value);
+                     [payloadModels, elapsedTimer](double value) {
+                         payloadModels.radiation->appendData(elapsedTimer->elapsed(), value);
                      });
 
     QObject::connect(serialReader, &SerialReader::errorOccurred,
@@ -89,7 +111,12 @@ int main(int argc, char *argv[])
 
     engine.rootContext()->setContextProperty("serialReader", serialReader);
 
-    const QString port = SerialReader::findHorizonPort();
+    // An explicit port (e.g. an emulator/virtual PTY) overrides auto-discovery:
+    //   HORIZON_SERIAL_PORT=/dev/pts/5 ./HorizonGroundstation
+    QString port = qEnvironmentVariable("HORIZON_SERIAL_PORT");
+    if (port.isEmpty()) {
+        port = SerialReader::findHorizonPort();
+    }
     if (port.isEmpty()) {
         qDebug() << "Horizon module not found, no Arduino Nano 33 IoT based chip detected";
     } else if (serialReader->openPort(port, 115200)) {
@@ -109,12 +136,18 @@ int main(int argc, char *argv[])
 
     engine.rootContext()->setContextProperty( "fmc", fmCollection );
 
-    engine.rootContext()->setContextProperty( "accelerationM", models.acceleration);
-    engine.rootContext()->setContextProperty( "rotationM", models.rotation);
-    engine.rootContext()->setContextProperty( "pressureM", models.pressure);
-    engine.rootContext()->setContextProperty( "altitudeM", models.altitude);
-    engine.rootContext()->setContextProperty( "velocityM", models.velocity);
-    engine.rootContext()->setContextProperty( "radiationM", models.radiation);
+    engine.rootContext()->setContextProperty( "avionicsAccelerationM", avionicsModels.acceleration);
+    engine.rootContext()->setContextProperty( "avionicsRotationM", avionicsModels.rotation);
+    engine.rootContext()->setContextProperty( "avionicsPressureM", avionicsModels.pressure);
+    engine.rootContext()->setContextProperty( "avionicsAltitudeM", avionicsModels.altitude);
+    engine.rootContext()->setContextProperty( "avionicsVelocityM", avionicsModels.velocity);
+
+    engine.rootContext()->setContextProperty( "payloadAccelerationM", payloadModels.acceleration);
+    engine.rootContext()->setContextProperty( "payloadRotationM", payloadModels.rotation);
+    engine.rootContext()->setContextProperty( "payloadPressureM", payloadModels.pressure);
+    engine.rootContext()->setContextProperty( "payloadAltitudeM", payloadModels.altitude);
+    engine.rootContext()->setContextProperty( "payloadVelocityM", payloadModels.velocity);
+    engine.rootContext()->setContextProperty( "payloadRadiationM", payloadModels.radiation);
 
     engine.rootContext()->setContextProperty("locationM", locationModel);
     engine.rootContext()->setContextProperty( "stateM", stateModel );

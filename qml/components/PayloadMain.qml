@@ -24,7 +24,7 @@ RowLayout {
                 RealtimeGraph {
                     id: realtimeAccelerationGraph
                     title: "Acceleration"
-                    model: accelerationM
+                    model: payloadAccelerationM
                     timer: topBar.missionTimer
                     windowSize: 60       // Show last 60 seconds of data
                     yAxisMax: 300
@@ -40,7 +40,7 @@ RowLayout {
                 RealtimeGraph {
                     id: realtimeRotationGraph
                     title: "Rotation"
-                    model: rotationM
+                    model: payloadRotationM
                     timer: topBar.missionTimer
                     windowSize: 60      // Show last 120 seconds of data
                     yAxisMax: 1000
@@ -57,7 +57,7 @@ RowLayout {
                 RealtimeGraph {
                     id: realtimeAltitudeGraph
                     title: "Altitude"
-                    model: altitudeM
+                    model: payloadAltitudeM
                     timer: topBar.missionTimer
                     windowSize: 60      // Show last 120 seconds of data
                     yAxisMax: 6000
@@ -72,7 +72,7 @@ RowLayout {
                 RealtimeGraph {
                     id: realtimeSpeedGraph
                     title: "Speed"
-                    model: velocityM
+                    model: payloadVelocityM
                     timer: topBar.missionTimer
                     windowSize: 60      // Show last 120 seconds of data
                     yAxisMax: 500
@@ -93,7 +93,7 @@ RowLayout {
          RealtimeGraph {
             id: realtimeRadiationGraph
             title: "Cosmic Radiation"
-            model: radiationM
+            model: payloadRadiationM
             timer: topBar.missionTimer
             Layout.preferredHeight: 2
             windowSize: 60      // Show last 120 seconds of data
