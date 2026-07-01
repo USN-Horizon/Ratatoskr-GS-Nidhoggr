@@ -15,6 +15,16 @@ exactly what the ground station parses:
     FLIGHT_STATES    (16000) -> flight phase (Horizon custom dialect)
     PAYLOAD_TEMPERATURE(16001)-> stack temps (Horizon custom dialect)
 
+Every message is tagged with a MAVLink component ID identifying which board
+"sent" it, mirroring the real vehicle: both boards share system ID 42, but
+avionics uses component ID 1 (MAV_COMP_ID_AUTOPILOT1) and the payload uses
+191 (see Payload firmware's include/New/Config.hpp and the ground station's
+src/horizoncomponents.h). Avionics streams its own IMU/baro plus GPS-derived
+speed and flight phase; the payload streams its own IMU/baro plus cosmic
+radiation, stack temperatures, and BARO_T. This lets the ground station's
+per-board model split be tested against two independently-tagged sources
+instead of one.
+
 No external dependencies (no pymavlink) - the v2 framing and X25 CRC are
 implemented inline, and the per-message CRC_EXTRA values are taken straight
 from HorizonDialect.h.
@@ -40,8 +50,9 @@ import time
 # ---------------------------------------------------------------------------
 
 STX_V2 = 0xFD
-SYSID = 1
-COMPID = 1
+SYSID = 42            # whole-rocket system ID
+COMPID_AVIONICS = 1   # MAV_COMP_ID_AUTOPILOT1
+COMPID_PAYLOAD = 191  # MAV_COMP_ID_ONBOARD_COMPUTER, repurposed for the payload
 
 # msgid -> CRC_EXTRA, copied from MAVLINK_MESSAGE_CRCS in HorizonDialect.h
 CRC_EXTRA = {
@@ -71,7 +82,7 @@ class Framer:
     def __init__(self):
         self.seq = 0
 
-    def frame(self, msgid: int, payload: bytes) -> bytes:
+    def frame(self, msgid: int, payload: bytes, compid: int) -> bytes:
         # v2 payload truncation: drop trailing zero bytes (keep at least 1)
         p = payload
         while len(p) > 1 and p[-1] == 0:
@@ -85,7 +96,7 @@ class Framer:
             0,             # compat_flags
             self.seq,      # sequence
             SYSID,
-            COMPID,
+            compid,
         ) + struct.pack("<I", msgid)[:3]  # 24-bit msgid, little-endian
 
         crc = x25_crc(header + p + bytes([CRC_EXTRA[msgid]]))
@@ -262,32 +273,44 @@ def main():
 
             out = bytearray()
 
-            # High-rate: IMU + pressure + speed every tick
-            wobble = math.sin(elapsed * 5.0)
-            out += framer.frame(*msg_scaled_imu(
-                t_ms, 50 * wobble, 50 * math.cos(elapsed * 5.0), accel_g * 1000))
-            out += framer.frame(*msg_scaled_imu2(
-                t_ms, 200 * wobble, 150 * math.cos(elapsed * 3.0), 80 * wobble))
+            # High-rate: each board streams its own IMU + pressure every tick.
+            # Avionics also derives speed from GPS (VFR_HUD); the payload has
+            # no GPS so it doesn't send that message.
             press = alt_to_pressure_hpa(alt)
             temp = 22.0 - alt * 0.0065        # rough lapse rate
-            out += framer.frame(*msg_scaled_pressure(t_ms, press, temp))
-            out += framer.frame(*msg_vfr_hud(abs(vspeed), alt, vspeed))
 
-            # 5 Hz: temperature as NAMED_VALUE_INT "BARO_T", payload temps
+            wobble = math.sin(elapsed * 5.0)
+            out += framer.frame(*msg_scaled_imu(
+                t_ms, 50 * wobble, 50 * math.cos(elapsed * 5.0), accel_g * 1000), COMPID_AVIONICS)
+            out += framer.frame(*msg_scaled_imu2(
+                t_ms, 200 * wobble, 150 * math.cos(elapsed * 3.0), 80 * wobble), COMPID_AVIONICS)
+            out += framer.frame(*msg_scaled_pressure(t_ms, press, temp), COMPID_AVIONICS)
+            out += framer.frame(*msg_vfr_hud(abs(vspeed), alt, vspeed), COMPID_AVIONICS)
+
+            # Payload's own IMU/baro: same physical flight, independent (phase-shifted) sensor noise.
+            payload_wobble = math.sin(elapsed * 5.0 + 0.7)
+            out += framer.frame(*msg_scaled_imu(
+                t_ms, 40 * payload_wobble, 40 * math.cos(elapsed * 5.0 + 0.7), accel_g * 1000), COMPID_PAYLOAD)
+            out += framer.frame(*msg_scaled_imu2(
+                t_ms, 150 * payload_wobble, 120 * math.cos(elapsed * 3.0 + 0.7), 60 * payload_wobble), COMPID_PAYLOAD)
+            out += framer.frame(*msg_scaled_pressure(t_ms, press * 1.001, temp), COMPID_PAYLOAD)
+
+            # 5 Hz: payload temperature as NAMED_VALUE_INT "BARO_T" + stack temps
             if tick % 10 == 0:
-                out += framer.frame(*msg_named_value_int(t_ms, "BARO_T", int(temp)))
+                out += framer.frame(*msg_named_value_int(t_ms, "BARO_T", int(temp)), COMPID_PAYLOAD)
                 out += framer.frame(*msg_payload_temperature(
-                    t_us, temp + 1, temp, temp - 1))
+                    t_us, temp + 1, temp, temp - 1), COMPID_PAYLOAD)
 
-            # 2 Hz: cosmic radiation + flight state
+            # 2 Hz: payload's cosmic radiation + avionics' flight-phase state
             if tick % 25 == 0:
                 rad = 50 + int(20 * (1 + math.sin(elapsed)))
-                out += framer.frame(*msg_cosmic_radiation(t_us, rad))
-                out += framer.frame(*msg_flight_states(t_us, phase))
+                out += framer.frame(*msg_cosmic_radiation(t_us, rad), COMPID_PAYLOAD)
+                out += framer.frame(*msg_flight_states(t_us, phase), COMPID_AVIONICS)
 
-            # 1 Hz: heartbeat
+            # 1 Hz: heartbeat from both components
             if tick % int(args.hz) == 0:
-                out += framer.frame(*msg_heartbeat())
+                out += framer.frame(*msg_heartbeat(), COMPID_AVIONICS)
+                out += framer.frame(*msg_heartbeat(), COMPID_PAYLOAD)
 
             os.write(fd, bytes(out))
 

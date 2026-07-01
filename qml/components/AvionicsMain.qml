@@ -19,7 +19,7 @@ RowLayout {
         RealtimeGraph {
             id: realtimeAccelerationGraph
             title: "Acceleration"
-            model: accelerationM
+            model: avionicsAccelerationM
             timer: topBar.missionTimer
             windowSize: 60       // Show last 60 seconds of data
             yAxisMax: 300
@@ -35,7 +35,7 @@ RowLayout {
         RealtimeGraph {
             id: realtimeRotationGraph
             title: "Rotation"
-            model: rotationM
+            model: avionicsRotationM
             timer: topBar.missionTimer
             windowSize: 60      // Show last 120 seconds of data
             yAxisMax: 1000
@@ -50,7 +50,7 @@ RowLayout {
         RealtimeGraph {
             id: realtimePressureGraph
             title: "Pressure"
-            model: pressureM
+            model: avionicsPressureM
             timer: topBar.missionTimer
             windowSize: 60      // Show last 120 seconds of data
             yAxisMax: 1200
@@ -65,7 +65,7 @@ RowLayout {
         RealtimeGraph {
             id: realtimeAltitudeGraph
             title: "Altitude"
-            model: altitudeM
+            model: avionicsAltitudeM
             timer: topBar.missionTimer
             windowSize: 60      // Show last 120 seconds of data
             yAxisMax: 6000
@@ -80,7 +80,7 @@ RowLayout {
         RealtimeGraph {
             id: realtimeSpeedGraph
             title: "Speed"
-            model: velocityM
+            model: avionicsVelocityM
             timer: topBar.missionTimer
             windowSize: 60      // Show last 120 seconds of data
             yAxisMax: 500

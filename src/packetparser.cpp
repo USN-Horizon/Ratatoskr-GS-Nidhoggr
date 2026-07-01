@@ -38,13 +38,13 @@ void PacketParser::handleMessage(const mavlink_message_t &msg)
     case MAVLINK_MSG_ID_SCALED_IMU: {
         mavlink_scaled_imu_t imu;
         mavlink_msg_scaled_imu_decode(&msg, &imu);
-        emit accelerationReceived(imu.xacc / 1000.0, imu.yacc / 1000.0, imu.zacc / 1000.0);
+        emit accelerationReceived(imu.xacc / 1000.0, imu.yacc / 1000.0, imu.zacc / 1000.0, msg.compid);
         break;
     }
     case MAVLINK_MSG_ID_SCALED_IMU2: {
         mavlink_scaled_imu_t imu;
         mavlink_msg_scaled_imu_decode(&msg, &imu);
-        emit rotationReceived(imu.xgyro / 1000.0, imu.ygyro / 1000.0, imu.zgyro / 1000.0);
+        emit rotationReceived(imu.xgyro / 1000.0, imu.ygyro / 1000.0, imu.zgyro / 1000.0, msg.compid);
         break;
     }
     case MAVLINK_MSG_ID_SCALED_IMU3: {
@@ -54,16 +54,16 @@ void PacketParser::handleMessage(const mavlink_message_t &msg)
     case MAVLINK_MSG_ID_SCALED_PRESSURE: {
         mavlink_scaled_pressure_t pres;
         mavlink_msg_scaled_pressure_decode(&msg, &pres);
-        emit pressureReceived(pres.press_abs);
+        emit pressureReceived(pres.press_abs, msg.compid);
         emit temperatureReceived(pres.temperature / 100.0);
         double alt = 44330.0 * (1.0 - pow(pres.press_abs / 1013.25, 0.1903));
-        emit altitudeReceived(alt);
+        emit altitudeReceived(alt, msg.compid);
         break;
     }
     case MAVLINK_MSG_ID_VFR_HUD: {
         mavlink_vfr_hud_t hud;
         mavlink_msg_vfr_hud_decode(&msg, &hud);
-        emit velocityReceived(hud.groundspeed);
+        emit velocityReceived(hud.groundspeed, msg.compid);
         break;
     }
     case MAVLINK_MSG_ID_COSMIC_RADIATION: {
